@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Factory · Feazer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Loading Bar -->
+  <div id="loading-bar" class="loading-bar hidden"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ===================== LOGIN SCREEN ===================== -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-main">Content Factory</span>
+        <span class="logo-sep"> · </span>
+        <span class="logo-brand">Feazer</span>
+      </div>
+      <p class="login-subtitle">Outil de gestion du calendrier éditorial LinkedIn</p>
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="password-input">Mot de passe</label>
+          <input type="password" id="password-input" placeholder="••••••••••••••" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary btn-full">Accéder →</button>
+        <p id="login-error" class="login-error hidden">Mot de passe incorrect.</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN APP ===================== -->
+  <div id="app" class="app hidden">
+
+    <!-- NAV -->
+    <nav class="nav">
+      <div class="nav-left">
+        <span class="nav-logo">Content Factory <span class="nav-logo-sep">·</span> Feazer</span>
+        <div class="nav-tabs">
+          <button class="nav-tab active" data-page="calendar">Calendrier</button>
+          <button class="nav-tab" data-page="sources">Gérer les sources</button>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="btn-ghost-sm" onclick="logout()">Déconnexion</button>
+      </div>
+    </nav>
+
+    <!-- =================== PAGE CALENDRIER =================== -->
+    <div id="page-calendar" class="page page-active">
+
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="btn-icon" id="prev-week" title="Semaine précédente">←</button>
+          <span id="week-label" class="week-label"></span>
+          <button class="btn-icon" id="next-week" title="Semaine suivante">→</button>
+        </div>
+        <div class="topbar-center">
+          <div class="profile-selector">
+            <button class="profile-btn active" data-profile="feazer">Page Feazer</button>
+            <button class="profile-btn" data-profile="marie">Marie</button>
+            <button class="profile-btn" data-profile="maxime">Maxime</button>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn-primary" id="generate-btn">Générer la semaine ↗</button>
+        </div>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="calendar-grid" id="calendar-grid">
+
+        <!-- P1 — Lundi -->
+        <div class="calendar-column">
+          <div class="column-header">
+            <div class="column-day-info">
+              <span class="col-day-name">Lundi</span>
+              <span class="col-day-date" id="date-p1"></span>
+            </div>
+            <span class="pilier-badge pilier-p1">P1 — Autorité</span>
+          </div>
+          <div class="cards-container" id="cards-p1">
+            <div class="col-empty-state">
+              <p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- P2 — Mercredi -->
+        <div class="calendar-column">
+          <div class="column-header">
+            <div class="column-day-info">
+              <span class="col-day-name">Mercredi</span>
+              <span class="col-day-date" id="date-p2"></span>
+            </div>
+            <span class="pilier-badge pilier-p2">P2 — Démonstration</span>
+          </div>
+          <div class="cards-container" id="cards-p2">
+            <div class="col-empty-state">
+              <p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- P3 — Vendredi -->
+        <div class="calendar-column">
+          <div class="column-header">
+            <div class="column-day-info">
+              <span class="col-day-name">Vendredi</span>
+              <span class="col-day-date" id="date-p3"></span>
+            </div>
+            <span class="pilier-badge pilier-p3">P3 — Culture / Diff.</span>
+          </div>
+          <div class="cards-container" id="cards-p3">
+            <div class="col-empty-state">
+              <p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =================== PAGE SOURCES =================== -->
+    <div id="page-sources" class="page">
+      <div class="sources-page">
+
+        <!-- Section 1 : URLs -->
+        <section class="sources-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">URLs de veille</h2>
+              <p class="section-desc">Sources consultées lors de la génération d'idées</p>
+            </div>
+            <button class="btn-primary" id="add-url-btn">+ Ajouter une URL</button>
+          </div>
+
+          <div id="add-url-form" class="add-form hidden">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nom</label>
+                <input type="text" id="new-url-name" placeholder="ex: McKinsey Insights">
+              </div>
+              <div class="form-group fg-grow">
+                <label>URL</label>
+                <input type="url" id="new-url-url" placeholder="https://...">
+              </div>
+              <div class="form-group">
+                <label>Pilier</label>
+                <select id="new-url-pilier">
+                  <option value="P1">P1 — Autorité</option>
+                  <option value="P2">P2 — Démonstration</option>
+                  <option value="P3">P3 — Culture / Diff.</option>
+                </select>
+              </div>
+              <div class="form-group form-actions-inline">
+                <label>&nbsp;</label>
+                <div class="btn-group">
+                  <button class="btn-primary" id="save-url-btn">Ajouter</button>
+                  <button class="btn-ghost" id="cancel-url-btn">Annuler</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>URL</th>
+                <th>Pilier</th>
+                <th>Actif</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="urls-tbody">
+              <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 2 : Calls -->
+        <section class="sources-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Calls clients</h2>
+              <p class="section-desc">Insights extraits de vos appels et notes clients</p>
+            </div>
+            <button class="btn-primary" id="add-call-btn">+ Ajouter un call</button>
+          </div>
+
+          <div id="add-call-form" class="add-form hidden">
+            <div class="form-group">
+              <label>Nom du call</label>
+              <input type="text" id="new-call-name" placeholder="ex: Call découverte — Client X — 04/05/2026">
+            </div>
+            <div class="form-group">
+              <label>Coller la transcription ou les notes</label>
+              <textarea id="new-call-content" rows="7" placeholder="Collez ici la transcription ou les notes du call…"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Ou importer un fichier .txt</label>
+              <input type="file" id="new-call-file" accept=".txt" class="file-input">
+              <p class="form-hint">Formats supportés : .txt — Pour les PDF, copiez-collez le texte ci-dessus.</p>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary" id="save-call-btn">Analyser et ajouter ↗</button>
+              <button class="btn-ghost" id="cancel-call-btn">Annuler</button>
+            </div>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Date</th>
+                <th>Insights extraits</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="calls-tbody">
+              <tr><td colspan="4" class="table-loading">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 3 : Repurposing -->
+        <section class="sources-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Repurposing</h2>
+              <p class="section-desc">Transformez du contenu existant en nouveaux angles LinkedIn</p>
+            </div>
+          </div>
+
+          <div class="repurposing-input-row">
+            <div class="form-group fg-grow">
+              <label>URL d'un article, post ou contenu à réutiliser</label>
+              <div class="input-btn-row">
+                <input type="url" id="repurposing-url" placeholder="https://...">
+                <button class="btn-primary" id="analyze-btn">Analyser ↗</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="repurposing-list">
+            <div class="table-empty">Aucun contenu analysé pour l'instant.</div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+  <!-- /app -->
+
+  <!-- =================== MODAL : ÉCRIRE =================== -->
+  <div id="write-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Rédiger le post</h3>
+        <button class="modal-close" id="close-write-modal" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta-row">
+          <div class="form-group fg-grow">
+            <label>Idée / Sujet</label>
+            <input type="text" id="write-title" class="input-readonly" readonly>
+          </div>
+          <div class="form-group">
+            <label>Pilier</label>
+            <div id="write-pilier-display"></div>
+          </div>
+          <div class="form-group">
+            <label>Format</label>
+            <div id="write-format-display"></div>
+          </div>
+        </div>
+        <div class="form-group" id="write-hook-group">
+          <label>Hook</label>
+          <div id="write-hook-display" class="hook-display"></div>
+        </div>
+        <button class="btn-primary btn-full" id="generate-post-btn">
+          <span id="gen-btn-label">Générer le post ↗</span>
+        </button>
+        <div id="post-output-group" class="form-group hidden">
+          <label>Post généré <span class="label-hint">(modifiable)</span></label>
+          <textarea id="post-content" rows="13" spellcheck="true"></textarea>
+          <div class="post-footer-row">
+            <span id="char-count" class="char-count">0 / 3000 caractères</span>
+            <div class="btn-group">
+              <button class="btn-secondary" id="copy-post-btn">Copier</button>
+              <button class="btn-primary" id="mark-ready-btn">Marquer comme prêt ✓</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== MODAL : CALL INSIGHTS =================== -->
+  <div id="call-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3 class="modal-title" id="call-modal-title">Insights du call</h3>
+        <button class="modal-close" id="close-call-modal" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body" id="call-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- =================== MODAL : REPURPOSING ANGLES =================== -->
+  <div id="repurposing-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3 class="modal-title" id="repurposing-modal-title">Angles identifiés</h3>
+        <button class="modal-close" id="close-repurposing-modal" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body" id="repurposing-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
