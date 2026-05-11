@@ -115,7 +115,7 @@ function toast(message, type = '') {
 // UTILS — API CALL
 // ──────────────────────────────────────────────
 async function api(endpoint, body) {
-  const res = await fetch(`/api/${endpoint}`, {
+  const res = await fetch(`/.netlify/functions/${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
