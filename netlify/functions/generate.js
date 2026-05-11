@@ -74,13 +74,16 @@ Génère exactement 10 idées variées dans les formats.`;
         'content-type':      'application/json',
       },
       body: JSON.stringify({
-        model:      'claude-3-5-sonnet-20241022',
+        model:      'claude-3-haiku-20240307',
         max_tokens: 4096,
         messages:   [{ role: 'user', content: prompt }],
       }),
     });
     const anthropicData = await anthropicRes.json();
-    if (!anthropicRes.ok) throw new Error(anthropicData.error?.message || `Anthropic error ${anthropicRes.status}`);
+    if (!anthropicRes.ok) {
+      console.error('[generate] Anthropic error:', anthropicRes.status, JSON.stringify(anthropicData, null, 2));
+      throw new Error(anthropicData.error?.message || `Anthropic error ${anthropicRes.status}`);
+    }
     const responseText = anthropicData.content
       .filter(b => b.type === 'text')
       .map(b => b.text)
