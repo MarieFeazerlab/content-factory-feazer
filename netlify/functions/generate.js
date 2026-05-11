@@ -104,15 +104,14 @@ Génère exactement 10 idées variées dans les formats.`;
     // Save to Airtable + collect recordIds
     const savedIdees = await Promise.all(idees.map(async idee => {
       const fields = {
-        Titre:                idee.titre || '',
-        Pilier:               pilier,
-        Format:               idee.format || 'Texte long',
-        Source:               idee.source || '',
-        Statut:               'Brouillon',
+        'Titre / idée':        idee.titre || '',
+        Pilier:                pilier,
+        Format:                idee.format || 'Texte long',
+        Source:                idee.source || '',
+        Statut:                'Brouillon',
         'Mode de publication': profilLabel,
-        Hook:                 idee.hook || '',
+        'Hook suggéré':        idee.hook || '',
         'Date de publication': semaine,
-        Jour:                 jour,
       };
 
       try {

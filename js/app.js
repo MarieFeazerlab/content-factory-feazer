@@ -252,8 +252,8 @@ function cardHTML(record) {
           <button class="btn-remove" title="Retirer" onclick="removeCard('${record.id}', '${f.Pilier}')">×</button>
         </div>
       </div>
-      <div class="card-title">${escHtml(f.Titre || '')}</div>
-      ${f.Hook ? `<div class="card-hook">${escHtml(f.Hook)}</div>` : ''}
+      <div class="card-title">${escHtml(f['Titre / idée'] || '')}</div>
+      ${f['Hook suggéré'] ? `<div class="card-hook">${escHtml(f['Hook suggéré'])}</div>` : ''}
       <div class="card-bottom-row">
         <span class="card-source">${escHtml(f.Source || '')}</span>
         <span class="status-badge ${statusClass}" onclick="cycleStatus('${record.id}', '${f.Statut || 'Brouillon'}', '${f.Pilier}')">${f.Statut || 'Brouillon'}</span>
@@ -395,8 +395,8 @@ async function openWriteModal(recordId) {
   if (!card) return;
 
   const fields = {
-    Titre:   card.querySelector('.card-title')?.textContent || '',
-    Hook:    card.querySelector('.card-hook')?.textContent  || '',
+    'Titre / idée': card.querySelector('.card-title')?.textContent || '',
+    'Hook suggéré': card.querySelector('.card-hook')?.textContent  || '',
     Format:  card.querySelector('.format-badge')?.textContent || '',
     Source:  card.querySelector('.card-source')?.textContent || '',
     Pilier:  card.dataset.pilier || 'P1',
@@ -405,7 +405,7 @@ async function openWriteModal(recordId) {
 
   state.currentCard = fields;
 
-  document.getElementById('write-title').value = fields.Titre;
+  document.getElementById('write-title').value = fields['Titre / idée'];
 
   const pilierDisplay = document.getElementById('write-pilier-display');
   pilierDisplay.innerHTML = `<span class="pilier-badge pilier-${fields.Pilier.toLowerCase()}">${fields.Pilier} — ${PILIERS[fields.Pilier]?.label || ''}</span>`;
@@ -414,9 +414,9 @@ async function openWriteModal(recordId) {
     `<span class="format-badge">${fields.Format}</span>`;
 
   const hookGroup = document.getElementById('write-hook-group');
-  if (fields.Hook) {
+  if (fields['Hook suggéré']) {
     hookGroup.style.display = '';
-    document.getElementById('write-hook-display').textContent = fields.Hook;
+    document.getElementById('write-hook-display').textContent = fields['Hook suggéré'];
   } else {
     hookGroup.style.display = 'none';
   }
