@@ -28,6 +28,9 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
 
   try {
+    const key = process.env.ANTHROPIC_KEY;
+    console.log('[generate] ANTHROPIC_KEY:', key ? `${key.slice(0, 16)}… (${key.length} chars)` : 'UNDEFINED');
+
     const { pilier, pilierLabel, semaine, profil, profilLabel, jour, sources = [] } = JSON.parse(event.body || '{}');
 
     if (!pilier || !semaine) throw new Error('pilier and semaine required');
