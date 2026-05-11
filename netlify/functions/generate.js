@@ -29,7 +29,7 @@ exports.handler = async (event) => {
 
   try {
     const key = process.env.ANTHROPIC_KEY;
-    console.log('[generate] ANTHROPIC_KEY:', key ? `${key.slice(0, 16)}… (${key.length} chars)` : 'UNDEFINED');
+    console.log('[generate] ANTHROPIC_KEY:', key ? `${key.slice(0, 10)}… (${key.length} chars)` : 'UNDEFINED');
 
     const { pilier, pilierLabel, semaine, profil, profilLabel, jour, sources = [] } = JSON.parse(event.body || '{}');
 
