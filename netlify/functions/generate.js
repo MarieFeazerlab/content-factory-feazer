@@ -18,6 +18,12 @@ const atHeaders = () => ({
   'Content-Type': 'application/json',
 });
 
+const PILIER_LABEL = {
+  P1: 'P1 — Autorité',
+  P2: 'P2 — Démonstration',
+  P3: 'P3 — Culture / Différenciation',
+};
+
 const PILIER_DESC = {
   P1: 'Autorité — positionnement expert, données sectorielles, benchmarks, tendances marché',
   P2: 'Démonstration — cas pratiques, méthodes de travail, retours d\'expérience, preuves concrètes',
@@ -105,7 +111,7 @@ Génère exactement 10 idées variées dans les formats.`;
     const savedIdees = await Promise.all(idees.map(async idee => {
       const fields = {
         'Titre / idée':        idee.titre || '',
-        Pilier:                pilier,
+        Pilier:                PILIER_LABEL[pilier] || pilier,
         Format:                idee.format || 'Texte long',
         Source:                idee.source || '',
         Statut:                'Brouillon',
