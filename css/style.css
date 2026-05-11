@@ -1034,3 +1034,55 @@ button { cursor: pointer; border: none; outline: none; }
 }
 
 @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* ============================================================
+   MODAL FOOTER
+   ============================================================ */
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   CARD DETAIL MODAL
+   ============================================================ */
+.card-detail-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.card-detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card-detail-value {
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.card-detail-citation {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text-2);
+  padding: 12px 16px;
+  background: var(--surface-3);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  line-height: 1.6;
+}

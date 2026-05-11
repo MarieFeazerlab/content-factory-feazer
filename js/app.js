@@ -35,6 +35,7 @@ const state = {
   profile:      'feazer',
   currentCard:  null,   // card data for write modal
   loadingBar:   null,   // interval ref
+  cardCache:    {},     // recordId → fields, for card detail modal
 };
 
 // ──────────────────────────────────────────────
@@ -230,6 +231,7 @@ function renderPilierCards(pilier, records) {
       </div>`;
     return;
   }
+  records.forEach(r => { state.cardCache[r.id] = r.fields; });
   container.innerHTML = records.map(r => cardHTML(r)).join('');
 }
 
@@ -436,6 +438,62 @@ async function openWriteModal(recordId) {
 function closeWriteModal() {
   document.getElementById('write-modal').classList.add('hidden');
   state.currentCard = null;
+}
+
+// ──────────────────────────────────────────────
+// CARD DETAIL MODAL
+// ──────────────────────────────────────────────
+const PILIER_LABELS_DETAIL = {
+  P1: 'Autorité',
+  P2: 'Démonstration',
+  P3: 'Culture / Différenciation',
+};
+
+function openCardDetail(recordId) {
+  const f = state.cardCache[recordId];
+  if (!f) return;
+
+  document.getElementById('card-detail-title').textContent = f['Titre / idée'] || 'Détail de l\'idée';
+
+  const pilierClass = { P1: 'pilier-p1', P2: 'pilier-p2', P3: 'pilier-p3' }[f.Pilier] || '';
+
+  document.getElementById('card-detail-body').innerHTML = `
+    <div class="card-detail-fields">
+      <div class="card-detail-field">
+        <span class="card-detail-label">Pilier</span>
+        <div><span class="pilier-badge ${pilierClass}">${escHtml(f.Pilier || '')} — ${escHtml(PILIER_LABELS_DETAIL[f.Pilier] || '')}</span></div>
+      </div>
+      <div class="card-detail-field">
+        <span class="card-detail-label">Format</span>
+        <div><span class="format-badge">${escHtml(f.Format || 'Texte long')}</span></div>
+      </div>
+      ${f['Hook suggéré'] ? `
+      <div class="card-detail-field">
+        <span class="card-detail-label">Hook suggéré</span>
+        <div class="hook-display">${escHtml(f['Hook suggéré'])}</div>
+      </div>` : ''}
+      ${f.Citation ? `
+      <div class="card-detail-field">
+        <span class="card-detail-label">Citation</span>
+        <div class="card-detail-citation">${escHtml(f.Citation)}</div>
+      </div>` : ''}
+      ${f.Source ? `
+      <div class="card-detail-field">
+        <span class="card-detail-label">Source</span>
+        <span class="card-detail-value">${escHtml(f.Source)}</span>
+      </div>` : ''}
+    </div>`;
+
+  document.getElementById('card-detail-write-btn').onclick = () => {
+    closeCardDetail();
+    openWriteModal(recordId);
+  };
+
+  document.getElementById('card-detail-modal').classList.remove('hidden');
+}
+
+function closeCardDetail() {
+  document.getElementById('card-detail-modal').classList.add('hidden');
 }
 
 async function generatePost() {
@@ -882,6 +940,20 @@ function init() {
 
   // Generate week
   document.getElementById('generate-btn').addEventListener('click', generateWeek);
+
+  // Card detail — event delegation sur toute la grid, ignore boutons et badges
+  document.getElementById('calendar-grid').addEventListener('click', e => {
+    if (e.target.closest('.btn-write, .btn-remove, .status-badge')) return;
+    const card = e.target.closest('.idea-card');
+    if (card) openCardDetail(card.dataset.id);
+  });
+
+  // Card detail modal — fermeture
+  document.getElementById('close-card-detail-modal').addEventListener('click', closeCardDetail);
+  document.getElementById('close-card-detail-modal-2').addEventListener('click', closeCardDetail);
+  document.getElementById('card-detail-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeCardDetail();
+  });
 
   // Write modal
   document.getElementById('close-write-modal').addEventListener('click', closeWriteModal);
