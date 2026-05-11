@@ -362,12 +362,12 @@ async function generateWeek() {
           renderPilierCards(pilier, result.idees.map(idee => ({
             id: idee.recordId,
             fields: {
-              Titre:                idee.titre,
-              Hook:                 idee.hook,
-              Format:               idee.format,
-              Source:               idee.source,
-              Statut:               'Brouillon',
-              Pilier:               pilier,
+              'Titre / idée':        idee.titre,
+              'Hook suggéré':        idee.hook,
+              Format:                idee.format,
+              Source:                idee.source,
+              Statut:                'Brouillon',
+              Pilier:                pilier,
               'Mode de publication': PROFILE_LABELS[profil],
             }
           })));
@@ -392,16 +392,16 @@ async function generateWeek() {
 // WRITE MODAL
 // ──────────────────────────────────────────────
 async function openWriteModal(recordId) {
-  // Find record from DOM
-  const card = document.querySelector(`.idea-card[data-id="${recordId}"]`);
-  if (!card) return;
+  const cached = state.cardCache[recordId] || {};
+  // Fallback to DOM if cache miss (e.g. older session)
+  const domCard = document.querySelector(`.idea-card[data-id="${recordId}"]`);
 
   const fields = {
-    'Titre / idée': card.querySelector('.card-title')?.textContent || '',
-    'Hook suggéré': card.querySelector('.card-hook')?.textContent  || '',
-    Format:  card.querySelector('.format-badge')?.textContent || '',
-    Source:  card.querySelector('.card-source')?.textContent || '',
-    Pilier:  card.dataset.pilier || 'P1',
+    'Titre / idée': cached['Titre / idée'] || domCard?.querySelector('.card-title')?.textContent || '',
+    'Hook suggéré': cached['Hook suggéré'] || domCard?.querySelector('.card-hook')?.textContent  || '',
+    Format:         cached.Format          || domCard?.querySelector('.format-badge')?.textContent || '',
+    Source:         cached.Source          || domCard?.querySelector('.card-source')?.textContent  || '',
+    Pilier:         cached.Pilier          || domCard?.dataset.pilier || 'P1',
     recordId,
   };
 
@@ -505,8 +505,8 @@ async function generatePost() {
 
   try {
     const result = await api('write', {
-      titre:       state.currentCard.Titre,
-      hook:        state.currentCard.Hook,
+      titre:       state.currentCard['Titre / idée'],
+      hook:        state.currentCard['Hook suggéré'],
       pilier:      state.currentCard.Pilier,
       pilierLabel: PILIERS[state.currentCard.Pilier]?.label || '',
       format:      state.currentCard.Format,

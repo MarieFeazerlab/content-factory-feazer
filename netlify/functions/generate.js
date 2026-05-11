@@ -3,8 +3,8 @@
 /* Generate week ideas — direct Anthropic API via fetch */
 
 const BASE_ID   = 'app59olgEI4U7pf1G';
-const TABLE     = 'Calendrier éditorial';
-const AT_BASE   = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE)}`;
+const TABLE_ID  = 'tblqdCcogbkp8RZhJ';
+const AT_BASE   = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
 
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
@@ -114,17 +114,17 @@ Génère exactement 10 idées variées dans les formats.`;
         'Date de publication': semaine,
       };
 
-      try {
-        const res = await fetch(AT_BASE, {
-          method:  'POST',
-          headers: atHeaders(),
-          body:    JSON.stringify({ fields }),
-        });
-        const data = await res.json();
-        return { ...idee, recordId: data.id };
-      } catch {
-        return { ...idee, recordId: `local_${Math.random().toString(36).slice(2)}` };
+      const res  = await fetch(AT_BASE, {
+        method:  'POST',
+        headers: atHeaders(),
+        body:    JSON.stringify({ fields }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.error('[generate] Airtable save error:', res.status, JSON.stringify(data));
+        throw new Error(data.error?.message || `Airtable error ${res.status}`);
       }
+      return { ...idee, recordId: data.id };
     }));
 
     return {

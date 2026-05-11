@@ -1014,6 +1014,14 @@ button { cursor: pointer; border: none; outline: none; }
 }
 .char-count.over { color: #e05252; }
 
+#post-content {
+  min-height: 220px;
+  max-height: 380px;
+  overflow-y: auto;
+  resize: vertical;
+  line-height: 1.6;
+}
+
 /* ============================================================
    SPINNING INDICATOR
    ============================================================ */
