@@ -1,6 +1,6 @@
 /* Generate week ideas using Anthropic + web_search */
 
-const Anthropic = require('@anthropic-ai/sdk');
+/* Generate week ideas — direct Anthropic API via fetch */
 
 const BASE_ID   = 'app59olgEI4U7pf1G';
 const TABLE     = 'Calendrier éditorial';
@@ -35,8 +35,6 @@ exports.handler = async (event) => {
 
     if (!pilier || !semaine) throw new Error('pilier and semaine required');
 
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_KEY });
-
     const sourcesList = sources.length > 0
       ? sources.map(s => `- ${s.nom}: ${s.url}`).join('\n')
       : '- Aucune source configurée, base-toi sur tes connaissances générales du marketing et du branding.';
@@ -68,12 +66,22 @@ Réponds UNIQUEMENT avec du JSON valide, sans texte autour, sans markdown, sans 
 Formats autorisés : "Texte long", "Carrousel", "Image+texte", "Vidéo"
 Génère exactement 10 idées variées dans les formats.`;
 
-    const response = await client.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4096,
-      messages: [{ role: 'user', content: prompt }],
+    const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key':         process.env.ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+        'content-type':      'application/json',
+      },
+      body: JSON.stringify({
+        model:      'claude-3-5-sonnet-20241022',
+        max_tokens: 4096,
+        messages:   [{ role: 'user', content: prompt }],
+      }),
     });
-    const responseText = response.content
+    const anthropicData = await anthropicRes.json();
+    if (!anthropicRes.ok) throw new Error(anthropicData.error?.message || `Anthropic error ${anthropicRes.status}`);
+    const responseText = anthropicData.content
       .filter(b => b.type === 'text')
       .map(b => b.text)
       .join('\n');
