@@ -71,7 +71,7 @@ Génère exactement 10 idées variées dans les formats.`;
     let responseText = '';
     try {
       const response = await client.messages.create({
-        model: 'claude-opus-4-5',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 4096,
         tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }],
         messages: [{ role: 'user', content: prompt }],
@@ -83,7 +83,7 @@ Génère exactement 10 idées variées dans les formats.`;
     } catch {
       // Fallback without web_search if tool not available
       const response = await client.messages.create({
-        model: 'claude-opus-4-5',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       });
