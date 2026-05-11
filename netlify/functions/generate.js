@@ -112,7 +112,7 @@ Génère exactement 10 idées variées dans les formats.`;
         Statut:               'Brouillon',
         'Mode de publication': profilLabel,
         Hook:                 idee.hook || '',
-        Semaine:              semaine,
+        'Date de publication': semaine,
         Jour:                 jour,
       };
 

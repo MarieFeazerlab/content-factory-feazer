@@ -202,7 +202,7 @@ async function loadCalendarCards() {
   });
 
   try {
-    const filter = `AND({Semaine}='${semaine}',{Mode de publication}='${profil}')`;
+    const filter = `AND({Date de publication}='${semaine}',{Mode de publication}='${profil}')`;
     const result = await airtableGet('Calendrier éditorial', filter);
     const records = result.records || [];
 
