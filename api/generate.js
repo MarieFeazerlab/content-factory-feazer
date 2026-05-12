@@ -27,6 +27,12 @@ const PILIER_CATEGORIES = {
   P3: ['Créa / Design', 'Feazer'],
 };
 
+const PILIER_SOURCE_INSTRUCTIONS = {
+  P1: "Utilise UNIQUEMENT les données chiffrées et études des sources Marketing. N'utilise PAS les verbatims clients.",
+  P2: "Utilise UNIQUEMENT les verbatims clients et exemples Feazer. Ancre chaque idée dans une situation client réelle.",
+  P3: "Utilise UNIQUEMENT les tendances créa et design des sources Créa/Design. N'utilise PAS les verbatims clients.",
+};
+
 function setCORS(res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -90,7 +96,10 @@ SEMAINE : ${semaine}
 SOURCES À CONSULTER POUR T'INSPIRER :
 ${sourcesList}
 
-En t'appuyant sur des recherches récentes depuis ces sources et sur l'actualité du secteur, génère exactement 10 idées de posts LinkedIn distinctes, pertinentes et actionnables pour ce pilier.
+INSTRUCTION D'UTILISATION DES SOURCES :
+${PILIER_SOURCE_INSTRUCTIONS[pilier]}
+
+En t'appuyant sur ces sources et sur l'actualité du secteur, génère exactement 10 idées de posts LinkedIn distinctes, pertinentes et actionnables pour ce pilier.
 
 RÈGLES ABSOLUES — à respecter sans exception :
 1. JAMAIS de formule "Ce n'est pas X, c'est Y" ou toute variante
