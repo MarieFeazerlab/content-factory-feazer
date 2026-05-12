@@ -67,8 +67,8 @@ export default async function handler(req, res) {
         const srcRecords = atSrcData.records || [];
         if (srcRecords.length > 0) {
           const lines = srcRecords.flatMap(r => {
-            if (r.fields.URL) {
-              return [`- ${r.fields.Nom || r.fields.URL}: ${r.fields.URL}`];
+            if (r.fields.url) {
+              return [`- ${r.fields.Nom || r.fields.url}: ${r.fields.url}`];
             }
             if (r.fields.Notes) {
               return r.fields.Notes
