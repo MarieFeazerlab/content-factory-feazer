@@ -21,6 +21,12 @@ const PILIER_DESC = {
   P3: "Culture / Différenciation — vision de l'agence, valeurs, coulisses créatives, inspirations",
 };
 
+const PILIER_CATEGORIES = {
+  P1: ['Marketing / Data FR', 'Marketing / Data Global'],
+  P2: ['Terrain / RDV clients', 'Feazer'],
+  P3: ['Créa / Design', 'Feazer'],
+};
+
 function setCORS(res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -39,11 +45,15 @@ export default async function handler(req, res) {
 
     if (!pilier || !semaine) throw new Error('pilier and semaine required');
 
-    // Fetch sources directly from Airtable
+    // Fetch sources from Airtable, filtered by the categories relevant to this pilier
     let sourcesList = '- Aucune source configurée, base-toi sur tes connaissances générales du marketing et du branding.';
     try {
+      const cats = PILIER_CATEGORIES[pilier] || [];
+      const orClauses = cats.map(c => `{Catégorie}='${c}'`).join(',');
+      const formula = cats.length > 1 ? `OR(${orClauses})` : orClauses;
+      const params = new URLSearchParams({ filterByFormula: formula, pageSize: '100' });
       const atSrcRes = await fetch(
-        `https://api.airtable.com/v0/${BASE_ID}/Sources?pageSize=100`,
+        `https://api.airtable.com/v0/${BASE_ID}/Sources?${params}`,
         { headers: atHeaders() }
       );
       if (atSrcRes.ok) {
