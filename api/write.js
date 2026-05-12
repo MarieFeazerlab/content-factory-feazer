@@ -1,13 +1,6 @@
 /* Write a full LinkedIn post from an idea */
 
-const Anthropic = require('@anthropic-ai/sdk');
-
-const CORS = {
-  'Access-Control-Allow-Origin':  '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Content-Type':                 'application/json',
-};
+import Anthropic from '@anthropic-ai/sdk';
 
 const PROFILE_CONTEXT = {
   feazer: 'la page entreprise de Feazer (agence créative et marketing, ton institutionnel mais humain, nous)',
@@ -16,26 +9,33 @@ const PROFILE_CONTEXT = {
 };
 
 const FORMAT_INSTRUCTIONS = {
-  'Texte long': 'Post narratif et structuré, 1200–1800 caractères. Paragraphes courts (1-3 lignes). Pas de bullet points au début. Fin forte avec une question ou prise de position.',
-  'Carrousel':  'Script de carrousel LinkedIn en 6 à 8 slides. Format : "Slide X : [Titre court]\\n[Contenu bullet]". Slide 1 = hook accrocheur. Slide finale = CTA ou question.',
-  'Image+texte':'Légende courte et percutante, 300–500 caractères. Contexte de l\'image suggéré en première ligne entre [crochets]. Puis le texte.',
-  'Vidéo':      'Script de vidéo LinkedIn. Durée cible : 60–90 secondes. Format : "INTRO (5s) :", "DÉVELOPPEMENT :", "CONCLUSION (10s) :". Ton direct, parlé.',
+  'Texte long':  'Post narratif et structuré, 1200–1800 caractères. Paragraphes courts (1-3 lignes). Pas de bullet points au début. Fin forte avec une question ou prise de position.',
+  'Carrousel':   'Script de carrousel LinkedIn en 6 à 8 slides. Format : "Slide X : [Titre court]\\n[Contenu bullet]". Slide 1 = hook accrocheur. Slide finale = CTA ou question.',
+  'Image+texte': "Légende courte et percutante, 300–500 caractères. Contexte de l'image suggéré en première ligne entre [crochets]. Puis le texte.",
+  'Vidéo':       'Script de vidéo LinkedIn. Durée cible : 60–90 secondes. Format : "INTRO (5s) :", "DÉVELOPPEMENT :", "CONCLUSION (10s) :". Ton direct, parlé.',
 };
 
-exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+function setCORS(res) {
+  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+}
+
+export default async function handler(req, res) {
+  setCORS(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const {
       titre, hook, pilier, pilierLabel, format,
       source, profil, profilLabel,
-    } = JSON.parse(event.body || '{}');
+    } = req.body || {};
 
     if (!titre) throw new Error('titre required');
 
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_KEY });
 
-    const profileCtx = PROFILE_CONTEXT[profil] || PROFILE_CONTEXT.feazer;
+    const profileCtx        = PROFILE_CONTEXT[profil] || PROFILE_CONTEXT.feazer;
     const formatInstructions = FORMAT_INSTRUCTIONS[format] || FORMAT_INSTRUCTIONS['Texte long'];
 
     const prompt = `Tu rédiges un post LinkedIn pour ${profileCtx}.
@@ -74,16 +74,8 @@ RÈGLES ABSOLUES :
       .join('\n')
       .trim();
 
-    return {
-      statusCode: 200,
-      headers:    CORS,
-      body:       JSON.stringify({ success: true, post }),
-    };
+    return res.status(200).json({ success: true, post });
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers:    CORS,
-      body:       JSON.stringify({ error: err.message }),
-    };
+    return res.status(500).json({ error: err.message });
   }
-};
+}

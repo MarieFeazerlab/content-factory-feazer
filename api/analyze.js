@@ -1,27 +1,27 @@
 /* Analyze call transcripts or URLs for content angles */
 
-const Anthropic = require('@anthropic-ai/sdk');
+import Anthropic from '@anthropic-ai/sdk';
 
 const BASE_ID = 'app59olgEI4U7pf1G';
 const AT_BASE = `https://api.airtable.com/v0/${BASE_ID}`;
-
-const CORS = {
-  'Access-Control-Allow-Origin':  '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Content-Type':                 'application/json',
-};
 
 const atHeaders = () => ({
   Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}`,
   'Content-Type': 'application/json',
 });
 
-exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+function setCORS(res) {
+  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+}
+
+export default async function handler(req, res) {
+  setCORS(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const { type, content, url, nom } = JSON.parse(event.body || '{}');
+    const { type, content, url, nom } = req.body || {};
     if (!type) throw new Error('type required (call | repurposing)');
 
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_KEY });
@@ -64,35 +64,28 @@ Génère entre 5 et 10 insights distincts.`;
         throw new Error('Erreur de parsing des insights');
       }
 
-      // Save to Airtable "Calls"
       const today = new Date().toISOString().slice(0, 10);
       await fetch(`${AT_BASE}/${encodeURIComponent('Calls')}`, {
         method:  'POST',
         headers: atHeaders(),
         body: JSON.stringify({
           fields: {
-            Nom:                nom || `Call du ${today}`,
-            Date:               today,
-            'Contenu brut':     content.slice(0, 20000),
+            Nom:                 nom || `Call du ${today}`,
+            Date:                today,
+            'Contenu brut':      content.slice(0, 20000),
             'Insights extraits': JSON.stringify(insights),
           },
         }),
       });
 
-      return {
-        statusCode: 200,
-        headers:    CORS,
-        body:       JSON.stringify({ success: true, insights: insights.insights || [] }),
-      };
+      return res.status(200).json({ success: true, insights: insights.insights || [] });
     }
 
     // ── REPURPOSING ANALYSIS ───────────────────────
     if (type === 'repurposing') {
       if (!url) throw new Error('url required for repurposing analysis');
 
-      let prompt;
       try {
-        // Attempt to fetch URL content via web_search
         const response = await client.messages.create({
           model:      'claude-sonnet-4-6',
           max_tokens: 3000,
@@ -133,13 +126,8 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
           }),
         });
 
-        return {
-          statusCode: 200,
-          headers:    CORS,
-          body:       JSON.stringify({ success: true, angles: angles.angles || [], titre: angles.titre }),
-        };
-      } catch (webErr) {
-        // Fallback without web_search
+        return res.status(200).json({ success: true, angles: angles.angles || [], titre: angles.titre });
+      } catch {
         const response = await client.messages.create({
           model:      'claude-sonnet-4-6',
           max_tokens: 2000,
@@ -175,20 +163,12 @@ Réponds en JSON : {"titre":"Titre supposé","angles":[{"angle":"...","hook":"..
           }),
         });
 
-        return {
-          statusCode: 200,
-          headers:    CORS,
-          body:       JSON.stringify({ success: true, angles: angles.angles || [], titre: angles.titre }),
-        };
+        return res.status(200).json({ success: true, angles: angles.angles || [], titre: angles.titre });
       }
     }
 
     throw new Error(`Unknown type: ${type}`);
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers:    CORS,
-      body:       JSON.stringify({ error: err.message }),
-    };
+    return res.status(500).json({ error: err.message });
   }
-};
+}

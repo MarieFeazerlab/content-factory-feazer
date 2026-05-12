@@ -1,17 +1,8 @@
-/* Generate week ideas using Anthropic + web_search */
-
 /* Generate week ideas — direct Anthropic API via fetch */
 
-const BASE_ID   = 'app59olgEI4U7pf1G';
-const TABLE_ID  = 'tblqdCcogbkp8RZhJ';
-const AT_BASE   = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
-
-const CORS = {
-  'Access-Control-Allow-Origin':  '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Content-Type':                 'application/json',
-};
+const BASE_ID  = 'app59olgEI4U7pf1G';
+const TABLE_ID = 'tblqdCcogbkp8RZhJ';
+const AT_BASE  = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
 
 const atHeaders = () => ({
   Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}`,
@@ -26,18 +17,25 @@ const PILIER_LABEL = {
 
 const PILIER_DESC = {
   P1: 'Autorité — positionnement expert, données sectorielles, benchmarks, tendances marché',
-  P2: 'Démonstration — cas pratiques, méthodes de travail, retours d\'expérience, preuves concrètes',
-  P3: 'Culture / Différenciation — vision de l\'agence, valeurs, coulisses créatives, inspirations',
+  P2: "Démonstration — cas pratiques, méthodes de travail, retours d'expérience, preuves concrètes",
+  P3: "Culture / Différenciation — vision de l'agence, valeurs, coulisses créatives, inspirations",
 };
 
-exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+function setCORS(res) {
+  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+}
+
+export default async function handler(req, res) {
+  setCORS(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const key = process.env.ANTHROPIC_KEY;
     console.log('[generate] ANTHROPIC_KEY:', key ? `${key.slice(0, 10)}… (${key.length} chars)` : 'UNDEFINED');
 
-    const { pilier, pilierLabel, semaine, profil, profilLabel, jour } = JSON.parse(event.body || '{}');
+    const { pilier, pilierLabel, semaine, profil, profilLabel, jour } = req.body || {};
 
     if (!pilier || !semaine) throw new Error('pilier and semaine required');
 
@@ -117,12 +115,12 @@ Génère exactement 10 idées variées dans les formats.`;
       console.error('[generate] Anthropic error:', anthropicRes.status, JSON.stringify(anthropicData, null, 2));
       throw new Error(anthropicData.error?.message || `Anthropic error ${anthropicRes.status}`);
     }
+
     const responseText = anthropicData.content
       .filter(b => b.type === 'text')
       .map(b => b.text)
       .join('\n');
 
-    // Extract JSON from response
     let ideas;
     try {
       const jsonMatch = responseText.match(/\{[\s\S]*"idees"[\s\S]*\}/);
@@ -147,29 +145,21 @@ Génère exactement 10 idées variées dans les formats.`;
         'Date de publication': semaine,
       };
 
-      const res  = await fetch(AT_BASE, {
+      const atRes  = await fetch(AT_BASE, {
         method:  'POST',
         headers: atHeaders(),
         body:    JSON.stringify({ fields }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        console.error('[generate] Airtable save error:', res.status, JSON.stringify(data));
-        throw new Error(data.error?.message || `Airtable error ${res.status}`);
+      const atData = await atRes.json();
+      if (!atRes.ok) {
+        console.error('[generate] Airtable save error:', atRes.status, JSON.stringify(atData));
+        throw new Error(atData.error?.message || `Airtable error ${atRes.status}`);
       }
-      return { ...idee, recordId: data.id };
+      return { ...idee, recordId: atData.id };
     }));
 
-    return {
-      statusCode: 200,
-      headers:    CORS,
-      body:       JSON.stringify({ success: true, idees: savedIdees }),
-    };
+    return res.status(200).json({ success: true, idees: savedIdees });
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers:    CORS,
-      body:       JSON.stringify({ error: err.message }),
-    };
+    return res.status(500).json({ error: err.message });
   }
-};
+}

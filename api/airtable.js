@@ -3,16 +3,8 @@
 const BASE_ID = 'app59olgEI4U7pf1G';
 const BASE_URL = `https://api.airtable.com/v0/${BASE_ID}`;
 
-// Only this table exists in the base. Unknown table names get graceful empty responses.
 const TABLE_MAP = {
   'Calendrier éditorial': 'tblqdCcogbkp8RZhJ',
-};
-
-const CORS = {
-  'Access-Control-Allow-Origin':  '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Content-Type':                 'application/json',
 };
 
 const atHeaders = () => ({
@@ -20,17 +12,22 @@ const atHeaders = () => ({
   'Content-Type': 'application/json',
 });
 
-exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+function setCORS(res) {
+  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+}
+
+export default async function handler(req, res) {
+  setCORS(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    const body = JSON.parse(event.body || '{}');
-    const { action, table, filter, fields, recordId } = body;
+    const { action, table, filter, fields, recordId } = req.body || {};
 
     if (!table) throw new Error('table required');
 
-    // Resolve table name to ID, fall back to using the name directly
-    const tableId = TABLE_MAP[table] || encodeURIComponent(table);
+    const tableId  = TABLE_MAP[table] || encodeURIComponent(table);
     const tableUrl = `${BASE_URL}/${tableId}`;
     let airtableRes, data;
 
@@ -41,54 +38,50 @@ exports.handler = async (event) => {
         params.set('pageSize', '100');
         airtableRes = await fetch(`${tableUrl}?${params}`, { headers: atHeaders() });
         data = await airtableRes.json();
-        if (airtableRes.status === 404) return { statusCode: 200, headers: CORS, body: JSON.stringify({ records: [] }) };
+        if (airtableRes.status === 404) return res.status(200).json({ records: [] });
         if (!airtableRes.ok) throw new Error(data.error?.message || 'Airtable error');
-        return { statusCode: 200, headers: CORS, body: JSON.stringify({ records: data.records || [] }) };
+        return res.status(200).json({ records: data.records || [] });
       }
 
       case 'create': {
         if (!fields) throw new Error('fields required');
         airtableRes = await fetch(tableUrl, {
-          method: 'POST',
+          method:  'POST',
           headers: atHeaders(),
-          body: JSON.stringify({ fields }),
+          body:    JSON.stringify({ fields }),
         });
         data = await airtableRes.json();
         if (!airtableRes.ok) throw new Error(data.error?.message || 'Airtable error');
-        return { statusCode: 200, headers: CORS, body: JSON.stringify({ record: data }) };
+        return res.status(200).json({ record: data });
       }
 
       case 'update': {
         if (!recordId || !fields) throw new Error('recordId and fields required');
         airtableRes = await fetch(`${tableUrl}/${recordId}`, {
-          method: 'PATCH',
+          method:  'PATCH',
           headers: atHeaders(),
-          body: JSON.stringify({ fields }),
+          body:    JSON.stringify({ fields }),
         });
         data = await airtableRes.json();
         if (!airtableRes.ok) throw new Error(data.error?.message || 'Airtable error');
-        return { statusCode: 200, headers: CORS, body: JSON.stringify({ record: data }) };
+        return res.status(200).json({ record: data });
       }
 
       case 'delete': {
         if (!recordId) throw new Error('recordId required');
         airtableRes = await fetch(`${tableUrl}/${recordId}`, {
-          method: 'DELETE',
+          method:  'DELETE',
           headers: atHeaders(),
         });
         data = await airtableRes.json();
         if (!airtableRes.ok) throw new Error(data.error?.message || 'Airtable error');
-        return { statusCode: 200, headers: CORS, body: JSON.stringify({ deleted: true }) };
+        return res.status(200).json({ deleted: true });
       }
 
       default:
         throw new Error(`Unknown action: ${action}`);
     }
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers: CORS,
-      body: JSON.stringify({ error: err.message }),
-    };
+    return res.status(500).json({ error: err.message });
   }
-};
+}
