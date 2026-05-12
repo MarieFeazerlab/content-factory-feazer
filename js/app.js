@@ -22,12 +22,11 @@ const SLOTS = [
   { dayName: 'Vendredi', dayOffset: 4 },
 ];
 
-// 4-week rotation — which 3 piliers are active each week
+// 3-week rotation — P4 fixe sur Vendredi, P1/P2/P3 tournent par paires sur Lundi+Mercredi
 const WEEK_ROTATION = [
-  ['P1', 'P2', 'P3'],
-  ['P1', 'P2', 'P4'],
-  ['P1', 'P3', 'P4'],
-  ['P2', 'P3', 'P4'],
+  ['P1', 'P2', 'P4'],  // semaine 1 — Lundi=P1, Mercredi=P2, Vendredi=P4
+  ['P1', 'P3', 'P4'],  // semaine 2 — Lundi=P1, Mercredi=P3, Vendredi=P4
+  ['P2', 'P3', 'P4'],  // semaine 3 — Lundi=P2, Mercredi=P3, Vendredi=P4
 ];
 
 function getISOWeekNumber(dateStr) {
@@ -39,7 +38,7 @@ function getISOWeekNumber(dateStr) {
 }
 
 function getWeekPiliers(semaine) {
-  return WEEK_ROTATION[(getISOWeekNumber(semaine) - 1) % 4];
+  return WEEK_ROTATION[(getISOWeekNumber(semaine) - 1) % 3];
 }
 
 const PILIER_LABELS_DETAIL = {

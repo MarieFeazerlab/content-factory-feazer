@@ -37,12 +37,11 @@ const PILIER_SOURCE_INSTRUCTIONS = {
   P4: "Utilise UNIQUEMENT les données et études IA des sources 'IA for Creative'. Ancre chaque idée dans un cas d'usage concret pour les créatifs ou équipes marketing.",
 };
 
-// Rotation sur 4 semaines : chaque semaine ISO active 3 piliers sur 4
+// 3-week rotation — P4 fixe sur Vendredi, P1/P2/P3 tournent par paires sur Lundi+Mercredi
 const WEEK_ROTATION = [
-  ['P1', 'P2', 'P3'],  // semaine 1 (ISO week % 4 === 1)
-  ['P1', 'P2', 'P4'],  // semaine 2
-  ['P1', 'P3', 'P4'],  // semaine 3
-  ['P2', 'P3', 'P4'],  // semaine 4
+  ['P1', 'P2', 'P4'],  // semaine 1 — Lundi=P1, Mercredi=P2, Vendredi=P4
+  ['P1', 'P3', 'P4'],  // semaine 2 — Lundi=P1, Mercredi=P3, Vendredi=P4
+  ['P2', 'P3', 'P4'],  // semaine 3 — Lundi=P2, Mercredi=P3, Vendredi=P4
 ];
 
 function getISOWeekNumber(dateStr) {
@@ -55,7 +54,7 @@ function getISOWeekNumber(dateStr) {
 
 export function getWeekPiliers(semaine) {
   const weekNum = getISOWeekNumber(semaine);
-  return WEEK_ROTATION[(weekNum - 1) % 4];
+  return WEEK_ROTATION[(weekNum - 1) % 3];
 }
 
 function setCORS(res) {
