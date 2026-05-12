@@ -130,14 +130,21 @@ ${PILIER_SOURCE_INSTRUCTIONS[pilier]}
 
 En t'appuyant sur ces sources et sur l'actualité du secteur, génère exactement 10 idées de posts LinkedIn distinctes, pertinentes et actionnables pour ce pilier.
 
+VOIX ÉDITORIALE :
+- Ton direct, sobre, sans jargon
+- Phrases courtes, prose fluide — pas de listes à puces systématiques
+- Ancré dans des situations concrètes vécues par les équipes marketing
+
 RÈGLES ABSOLUES — à respecter sans exception :
-1. JAMAIS de formule "Ce n'est pas X, c'est Y" ou toute variante
-2. AUCUN tiret cadratin (—) dans les titres ou hooks
-3. MOTS INTERDITS : révolutionnaire, game-changer, incroyable, vraiment, booster, chaos, scale
-4. Ton humain et direct, ancré dans des données chiffrées réelles et récentes
-5. Hooks courts (maximum 15 mots), créant une tension ou curiosité immédiate
-6. Chaque idée doit être distincte et apporter une valeur différente
-7. Sources citées doivent être cohérentes avec la liste fournie
+1. MOTS INTERDITS : révolutionnaire, game-changer, incroyable, vraiment, booster, friction, chaos, scale
+2. CONSTRUCTIONS INTERDITES : "ce n'est pas X c'est Y", "pas parce que X mais parce que Y", et toute variante
+3. AUCUN tiret cadratin dans les titres ou hooks
+4. Pas de triptyques parfaits ni de structures trop lisses
+5. Hook (max 15 mots) : créer une tension ou curiosité sans dévoiler la conclusion
+6. Corps : au moins un exemple concret ou chiffre réel
+7. Conclusion : point de vue assumé ou question qui invite à réagir — jamais générique
+8. Chaque idée doit être distincte et apporter une valeur différente
+9. Sources citées doivent être cohérentes avec la liste fournie
 
 Réponds UNIQUEMENT avec du JSON valide, sans texte autour, sans markdown, sans \`\`\` :
 {"idees":[{"titre":"Sujet complet du post (max 80 caractères)","hook":"Première phrase d'accroche (max 15 mots)","format":"Texte long","source":"Nom de la source inspirante","angle":"Angle unique de ce post en une phrase"}]}
