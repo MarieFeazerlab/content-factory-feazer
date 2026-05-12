@@ -618,9 +618,9 @@ function renderSourceCategory(slug, records) {
   }
   ul.innerHTML = records.map(r => `
     <li class="source-url-item">
-      <a href="${escHtml(r.fields.URL || '#')}" target="_blank" rel="noopener" class="source-url-link">
-        <span class="source-url-name">${escHtml(r.fields.Nom || r.fields.URL || '')}</span>
-        <span class="source-url-host">${escHtml(getHostname(r.fields.URL || ''))}</span>
+      <a href="${escHtml(r.fields.url || '#')}" target="_blank" rel="noopener" class="source-url-link">
+        <span class="source-url-name">${escHtml(r.fields.Nom || r.fields.url || '')}</span>
+        <span class="source-url-host">${escHtml(getHostname(r.fields.url || ''))}</span>
       </a>
       <button class="btn-remove-source" onclick="deleteSource('${r.id}','${slug}')" title="Supprimer">×</button>
     </li>
@@ -648,7 +648,7 @@ async function addSource(category, slug) {
   try {
     await airtableCreate('Sources', {
       Nom: nom || getHostname(url),
-      URL: url,
+      url: url,
       'Catégorie': category,
     });
     nomEl.value = '';

@@ -118,7 +118,7 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
           headers: atHeaders(),
           body: JSON.stringify({
             fields: {
-              URL:               url,
+              url:               url,
               Titre:             angles.titre || url,
               'Angles extraits': JSON.stringify(angles),
               Date:              today,
@@ -155,7 +155,7 @@ Réponds en JSON : {"titre":"Titre supposé","angles":[{"angle":"...","hook":"..
           headers: atHeaders(),
           body: JSON.stringify({
             fields: {
-              URL:               url,
+              url:               url,
               Titre:             angles.titre || url,
               'Angles extraits': JSON.stringify(angles),
               Date:              today,
