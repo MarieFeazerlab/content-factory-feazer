@@ -13,25 +13,50 @@ const PILIER_LABEL = {
   P1: 'P1 — Autorité',
   P2: 'P2 — Démonstration',
   P3: 'P3 — Culture / Différenciation',
+  P4: 'P4 — IA for Creative',
 };
 
 const PILIER_DESC = {
   P1: 'Autorité — positionnement expert, données sectorielles, benchmarks, tendances marché',
   P2: "Démonstration — cas pratiques, méthodes de travail, retours d'expérience, preuves concrètes",
   P3: "Culture / Différenciation — vision de l'agence, valeurs, coulisses créatives, inspirations",
+  P4: "IA for Creative — usage de l'IA dans les métiers créatifs et marketing, outils génératifs, impact sur les équipes créa",
 };
 
 const PILIER_CATEGORIES = {
   P1: ['Marketing / Data FR', 'Marketing / Data Global'],
   P2: ['Terrain / RDV clients', 'Feazer'],
   P3: ['Créa / Design', 'Feazer'],
+  P4: ['IA for Creative'],
 };
 
 const PILIER_SOURCE_INSTRUCTIONS = {
   P1: "Utilise UNIQUEMENT les données chiffrées et études des sources Marketing. N'utilise PAS les verbatims clients.",
   P2: "Utilise UNIQUEMENT les verbatims clients et exemples Feazer. Ancre chaque idée dans une situation client réelle.",
   P3: "Utilise UNIQUEMENT les tendances créa et design des sources Créa/Design. N'utilise PAS les verbatims clients.",
+  P4: "Utilise UNIQUEMENT les données et études IA des sources 'IA for Creative'. Ancre chaque idée dans un cas d'usage concret pour les créatifs ou équipes marketing.",
 };
+
+// Rotation sur 4 semaines : chaque semaine ISO active 3 piliers sur 4
+const WEEK_ROTATION = [
+  ['P1', 'P2', 'P3'],  // semaine 1 (ISO week % 4 === 1)
+  ['P1', 'P2', 'P4'],  // semaine 2
+  ['P1', 'P3', 'P4'],  // semaine 3
+  ['P2', 'P3', 'P4'],  // semaine 4
+];
+
+function getISOWeekNumber(dateStr) {
+  const d = new Date(dateStr);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+}
+
+export function getWeekPiliers(semaine) {
+  const weekNum = getISOWeekNumber(semaine);
+  return WEEK_ROTATION[(weekNum - 1) % 4];
+}
 
 function setCORS(res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
@@ -50,6 +75,11 @@ export default async function handler(req, res) {
     const { pilier, pilierLabel, semaine, profil, profilLabel, jour } = req.body || {};
 
     if (!pilier || !semaine) throw new Error('pilier and semaine required');
+
+    const activePiliers = getWeekPiliers(semaine);
+    if (!activePiliers.includes(pilier)) {
+      console.warn(`[generate] Pilier ${pilier} hors rotation pour la semaine ${semaine} (actifs: ${activePiliers.join(', ')})`);
+    }
 
     // Fetch sources from Airtable, filtered by the categories relevant to this pilier
     let sourcesList = '- Aucune source configurée, base-toi sur tes connaissances générales du marketing et du branding.';

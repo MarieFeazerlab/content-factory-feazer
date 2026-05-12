@@ -9,15 +9,44 @@ const PASSWORD = 'Feazercontent2026!?!?';
 const SESSION_KEY = 'cf_feazer_auth';
 
 const PILIERS = {
-  P1: { label: 'Autorité',                  jour: 'Lundi',    dayOffset: 0 },
-  P2: { label: 'Démonstration',             jour: 'Mercredi', dayOffset: 2 },
-  P3: { label: 'Culture / Différenciation', jour: 'Vendredi', dayOffset: 4 },
+  P1: { label: 'Autorité' },
+  P2: { label: 'Démonstration' },
+  P3: { label: 'Culture / Différenciation' },
+  P4: { label: 'IA for Creative' },
 };
+
+// 3 calendar slots = Lundi / Mercredi / Vendredi (fixed days)
+const SLOTS = [
+  { dayName: 'Lundi',    dayOffset: 0 },
+  { dayName: 'Mercredi', dayOffset: 2 },
+  { dayName: 'Vendredi', dayOffset: 4 },
+];
+
+// 4-week rotation — which 3 piliers are active each week
+const WEEK_ROTATION = [
+  ['P1', 'P2', 'P3'],
+  ['P1', 'P2', 'P4'],
+  ['P1', 'P3', 'P4'],
+  ['P2', 'P3', 'P4'],
+];
+
+function getISOWeekNumber(dateStr) {
+  const d = new Date(dateStr);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+}
+
+function getWeekPiliers(semaine) {
+  return WEEK_ROTATION[(getISOWeekNumber(semaine) - 1) % 4];
+}
 
 const PILIER_LABELS_DETAIL = {
   P1: 'Autorité',
   P2: 'Démonstration',
   P3: 'Culture / Différenciation',
+  P4: 'IA for Creative',
 };
 
 const STATUS_CYCLE = ['Brouillon', 'Prêt à publier', 'Publié'];
@@ -45,11 +74,12 @@ const SOURCE_CATEGORIES = [
 // STATE
 // ──────────────────────────────────────────────
 const state = {
-  weekStart:  getWeekStart(new Date()),
-  profile:    'feazer',
+  weekStart:   getWeekStart(new Date()),
+  profile:     'feazer',
   currentCard: null,
   loadingBar:  null,
   cardCache:   {},
+  weekPiliers: [],  // active piliers for the displayed week [P1/P2/P3/P4]
 };
 
 // ──────────────────────────────────────────────
@@ -213,9 +243,13 @@ function showPage(page) {
 // ──────────────────────────────────────────────
 function renderWeekHeader() {
   document.getElementById('week-label').textContent = formatWeekLabel(state.weekStart);
-  Object.entries(PILIERS).forEach(([code, info]) => {
-    const date = addDays(state.weekStart, info.dayOffset);
-    document.getElementById(`date-${code.toLowerCase()}`).textContent = formatDateFull(date);
+  state.weekPiliers = getWeekPiliers(toISODate(state.weekStart));
+  state.weekPiliers.forEach((pilier, i) => {
+    const date = addDays(state.weekStart, SLOTS[i].dayOffset);
+    document.getElementById(`date-col-${i}`).textContent = formatDateFull(date);
+    const badge = document.getElementById(`pilier-col-${i}`);
+    badge.className = `pilier-badge pilier-${pilier.toLowerCase()}`;
+    badge.textContent = `${pilier} — ${PILIERS[pilier].label}`;
   });
 }
 
@@ -226,8 +260,8 @@ async function loadCalendarCards() {
   const semaine = toISODate(state.weekStart);
   const profil  = PROFILE_LABELS[state.profile];
 
-  ['P1','P2','P3'].forEach(p => {
-    document.getElementById(`cards-${p.toLowerCase()}`).innerHTML =
+  state.weekPiliers.forEach((p, i) => {
+    document.getElementById(`cards-col-${i}`).innerHTML =
       '<div class="col-empty-state"><p>Chargement…</p></div>';
   });
 
@@ -236,23 +270,24 @@ async function loadCalendarCards() {
     const result = await airtableGet('Calendrier éditorial', filter);
     const records = result.records || [];
 
-    const byPilier = { P1: [], P2: [], P3: [] };
+    const byPilier = {};
+    state.weekPiliers.forEach(p => { byPilier[p] = []; });
     records.forEach(r => {
       const p = pilierCode(r.fields.Pilier);
-      if (byPilier[p]) byPilier[p].push(r);
+      if (p in byPilier) byPilier[p].push(r);
     });
 
-    ['P1','P2','P3'].forEach(p => renderPilierCards(p, byPilier[p]));
+    state.weekPiliers.forEach((p, i) => renderPilierCards(p, i, byPilier[p]));
   } catch (err) {
-    ['P1','P2','P3'].forEach(p => {
-      document.getElementById(`cards-${p.toLowerCase()}`).innerHTML =
+    state.weekPiliers.forEach((p, i) => {
+      document.getElementById(`cards-col-${i}`).innerHTML =
         `<div class="col-empty-state"><p>Erreur de chargement.<br>${err.message}</p></div>`;
     });
   }
 }
 
-function renderPilierCards(pilier, records) {
-  const container = document.getElementById(`cards-${pilier.toLowerCase()}`);
+function renderPilierCards(pilier, slotIndex, records) {
+  const container = document.getElementById(`cards-col-${slotIndex}`);
   if (!records || records.length === 0) {
     container.innerHTML = `
       <div class="col-empty-state">
@@ -261,10 +296,10 @@ function renderPilierCards(pilier, records) {
     return;
   }
   records.forEach(r => { state.cardCache[r.id] = r.fields; });
-  container.innerHTML = records.map(r => cardHTML(r)).join('');
+  container.innerHTML = records.map(r => cardHTML(r, slotIndex)).join('');
 }
 
-function cardHTML(record) {
+function cardHTML(record, slotIndex) {
   const f = record.fields;
   const pCode = pilierCode(f.Pilier);
   const statusClass = {
@@ -274,12 +309,12 @@ function cardHTML(record) {
   }[f.Statut] || 'status-brouillon';
 
   return `
-    <div class="idea-card" data-id="${record.id}" data-pilier="${pCode}">
+    <div class="idea-card" data-id="${record.id}" data-pilier="${pCode}" data-slot="${slotIndex}">
       <div class="card-top-row">
         <span class="format-badge">${escHtml(f.Format || 'Texte long')}</span>
         <div class="card-actions-row">
           <button class="btn-write" onclick="openWriteModal('${record.id}')">Écrire ↗</button>
-          <button class="btn-remove" title="Retirer" onclick="removeCard('${record.id}','${pCode}')">×</button>
+          <button class="btn-remove" title="Retirer" onclick="removeCard('${record.id}')">×</button>
         </div>
       </div>
       <div class="card-title">${escHtml(f['Titre / idée'] || '')}</div>
@@ -319,18 +354,18 @@ async function cycleStatus(recordId, currentStatus, pilier) {
 // ──────────────────────────────────────────────
 // CALENDAR — REMOVE CARD
 // ──────────────────────────────────────────────
-async function removeCard(recordId, pilier) {
+async function removeCard(recordId) {
   if (!confirm('Retirer cette idée ?')) return;
   try {
     await airtableDelete('Calendrier éditorial', recordId);
     const card = document.querySelector(`.idea-card[data-id="${recordId}"]`);
     if (card) {
+      const slotIndex = card.dataset.slot;
       card.style.transition = 'opacity 0.2s';
       card.style.opacity = '0';
       setTimeout(() => {
         card.remove();
-        const pCode = pilierCode(pilier).toLowerCase();
-        const container = document.getElementById(`cards-${pCode}`);
+        const container = document.getElementById(`cards-col-${slotIndex}`);
         if (container && !container.querySelector('.idea-card')) {
           container.innerHTML = `<div class="col-empty-state"><p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p></div>`;
         }
@@ -354,20 +389,22 @@ async function generateWeek() {
   const profil  = state.profile;
 
   try {
-    for (const [pilier, info] of Object.entries(PILIERS)) {
-      document.getElementById(`cards-${pilier.toLowerCase()}`).innerHTML =
+    for (let i = 0; i < state.weekPiliers.length; i++) {
+      const pilier = state.weekPiliers[i];
+      const slot   = SLOTS[i];
+      document.getElementById(`cards-col-${i}`).innerHTML =
         '<div class="col-empty-state"><p>Génération en cours…</p></div>';
       try {
         const result = await api('generate', {
           pilier,
-          pilierLabel: info.label,
+          pilierLabel: PILIERS[pilier].label,
           semaine,
           profil,
           profilLabel: PROFILE_LABELS[profil],
-          jour:        info.jour,
+          jour:        slot.dayName,
         });
         if (result.idees) {
-          renderPilierCards(pilier, result.idees.map(idee => ({
+          renderPilierCards(pilier, i, result.idees.map(idee => ({
             id: idee.recordId,
             fields: {
               'Titre / idée':        idee.titre,
@@ -381,7 +418,7 @@ async function generateWeek() {
           })));
         }
       } catch (err) {
-        document.getElementById(`cards-${pilier.toLowerCase()}`).innerHTML =
+        document.getElementById(`cards-col-${i}`).innerHTML =
           `<div class="col-empty-state"><p>Erreur : ${escHtml(err.message)}</p></div>`;
       }
     }
