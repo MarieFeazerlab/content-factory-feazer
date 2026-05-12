@@ -11,13 +11,10 @@
 </head>
 <body>
 
-  <!-- Loading Bar -->
   <div id="loading-bar" class="loading-bar hidden"></div>
-
-  <!-- Toast Container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- ===================== LOGIN SCREEN ===================== -->
+  <!-- ===================== LOGIN ===================== -->
   <div id="login-screen" class="login-screen">
     <div class="login-card">
       <div class="login-logo">
@@ -37,10 +34,9 @@
     </div>
   </div>
 
-  <!-- ===================== MAIN APP ===================== -->
+  <!-- ===================== APP ===================== -->
   <div id="app" class="app hidden">
 
-    <!-- NAV -->
     <nav class="nav">
       <div class="nav-left">
         <span class="nav-logo">Content Factory <span class="nav-logo-sep">·</span> Feazer</span>
@@ -54,15 +50,13 @@
       </div>
     </nav>
 
-    <!-- =================== PAGE CALENDRIER =================== -->
+    <!-- ========== CALENDRIER ========== -->
     <div id="page-calendar" class="page page-active">
-
-      <!-- Topbar -->
       <div class="topbar">
         <div class="topbar-left">
-          <button class="btn-icon" id="prev-week" title="Semaine précédente">←</button>
+          <button class="btn-icon" id="prev-week">←</button>
           <span id="week-label" class="week-label"></span>
-          <button class="btn-icon" id="next-week" title="Semaine suivante">→</button>
+          <button class="btn-icon" id="next-week">→</button>
         </div>
         <div class="topbar-center">
           <div class="profile-selector">
@@ -76,10 +70,7 @@
         </div>
       </div>
 
-      <!-- Calendar Grid -->
       <div class="calendar-grid" id="calendar-grid">
-
-        <!-- P1 — Lundi -->
         <div class="calendar-column">
           <div class="column-header">
             <div class="column-day-info">
@@ -89,13 +80,9 @@
             <span class="pilier-badge pilier-p1">P1 — Autorité</span>
           </div>
           <div class="cards-container" id="cards-p1">
-            <div class="col-empty-state">
-              <p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p>
-            </div>
+            <div class="col-empty-state"><p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p></div>
           </div>
         </div>
-
-        <!-- P2 — Mercredi -->
         <div class="calendar-column">
           <div class="column-header">
             <div class="column-day-info">
@@ -105,13 +92,9 @@
             <span class="pilier-badge pilier-p2">P2 — Démonstration</span>
           </div>
           <div class="cards-container" id="cards-p2">
-            <div class="col-empty-state">
-              <p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p>
-            </div>
+            <div class="col-empty-state"><p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p></div>
           </div>
         </div>
-
-        <!-- P3 — Vendredi -->
         <div class="calendar-column">
           <div class="column-header">
             <div class="column-day-info">
@@ -121,149 +104,101 @@
             <span class="pilier-badge pilier-p3">P3 — Culture / Diff.</span>
           </div>
           <div class="cards-container" id="cards-p3">
-            <div class="col-empty-state">
-              <p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p>
-            </div>
+            <div class="col-empty-state"><p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p></div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- =================== PAGE SOURCES =================== -->
+    <!-- ========== SOURCES ========== -->
     <div id="page-sources" class="page">
       <div class="sources-page">
 
-        <!-- Section 1 : URLs -->
+        <div class="sources-page-header">
+          <h1 class="sources-page-title">Gérer les sources</h1>
+          <p class="sources-page-desc">Sources de veille passées en contexte lors de la génération d'idées</p>
+        </div>
+
+        <!-- Grille 2×2 catégories URL -->
+        <div class="sources-categories-grid">
+
+          <div class="source-category-card">
+            <div class="source-cat-header">
+              <h3 class="source-cat-title">Créa / Design</h3>
+              <button class="btn-ghost-sm" onclick="toggleAddSourceForm('crea')">+ Ajouter</button>
+            </div>
+            <div id="add-form-crea" class="source-add-form hidden">
+              <input type="text" id="new-src-name-crea" placeholder="Nom">
+              <input type="url" id="new-src-url-crea" placeholder="https://…">
+              <button class="btn-primary" onclick="addSource('Créa / Design','crea')">OK</button>
+              <button class="btn-ghost" onclick="toggleAddSourceForm('crea')">✕</button>
+            </div>
+            <ul class="source-url-list" id="sources-cat-crea"><li class="source-loading">Chargement…</li></ul>
+          </div>
+
+          <div class="source-category-card">
+            <div class="source-cat-header">
+              <h3 class="source-cat-title">Marketing / Data FR</h3>
+              <button class="btn-ghost-sm" onclick="toggleAddSourceForm('mktfr')">+ Ajouter</button>
+            </div>
+            <div id="add-form-mktfr" class="source-add-form hidden">
+              <input type="text" id="new-src-name-mktfr" placeholder="Nom">
+              <input type="url" id="new-src-url-mktfr" placeholder="https://…">
+              <button class="btn-primary" onclick="addSource('Marketing / Data FR','mktfr')">OK</button>
+              <button class="btn-ghost" onclick="toggleAddSourceForm('mktfr')">✕</button>
+            </div>
+            <ul class="source-url-list" id="sources-cat-mktfr"><li class="source-loading">Chargement…</li></ul>
+          </div>
+
+          <div class="source-category-card">
+            <div class="source-cat-header">
+              <h3 class="source-cat-title">Marketing / Data Global</h3>
+              <button class="btn-ghost-sm" onclick="toggleAddSourceForm('mktglobal')">+ Ajouter</button>
+            </div>
+            <div id="add-form-mktglobal" class="source-add-form hidden">
+              <input type="text" id="new-src-name-mktglobal" placeholder="Nom">
+              <input type="url" id="new-src-url-mktglobal" placeholder="https://…">
+              <button class="btn-primary" onclick="addSource('Marketing / Data Global','mktglobal')">OK</button>
+              <button class="btn-ghost" onclick="toggleAddSourceForm('mktglobal')">✕</button>
+            </div>
+            <ul class="source-url-list" id="sources-cat-mktglobal"><li class="source-loading">Chargement…</li></ul>
+          </div>
+
+          <div class="source-category-card">
+            <div class="source-cat-header">
+              <h3 class="source-cat-title">Feazer</h3>
+              <button class="btn-ghost-sm" onclick="toggleAddSourceForm('feazer-src')">+ Ajouter</button>
+            </div>
+            <div id="add-form-feazer-src" class="source-add-form hidden">
+              <input type="text" id="new-src-name-feazer-src" placeholder="Nom">
+              <input type="url" id="new-src-url-feazer-src" placeholder="https://…">
+              <button class="btn-primary" onclick="addSource('Feazer','feazer-src')">OK</button>
+              <button class="btn-ghost" onclick="toggleAddSourceForm('feazer-src')">✕</button>
+            </div>
+            <ul class="source-url-list" id="sources-cat-feazer-src"><li class="source-loading">Chargement…</li></ul>
+          </div>
+
+        </div>
+
+        <!-- Verbatims terrain -->
         <section class="sources-section">
           <div class="section-header">
             <div>
-              <h2 class="section-title">URLs de veille</h2>
-              <p class="section-desc">Sources consultées lors de la génération d'idées</p>
+              <h2 class="section-title">Terrain / RDV clients</h2>
+              <p class="section-desc">Verbatims clients — utilisés comme contexte dans la génération d'idées</p>
             </div>
-            <button class="btn-primary" id="add-url-btn">+ Ajouter une URL</button>
+            <button class="btn-primary" id="save-verbatims-btn">Sauvegarder</button>
           </div>
-
-          <div id="add-url-form" class="add-form hidden">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Nom</label>
-                <input type="text" id="new-url-name" placeholder="ex: McKinsey Insights">
-              </div>
-              <div class="form-group fg-grow">
-                <label>URL</label>
-                <input type="url" id="new-url-url" placeholder="https://...">
-              </div>
-              <div class="form-group">
-                <label>Pilier</label>
-                <select id="new-url-pilier">
-                  <option value="P1">P1 — Autorité</option>
-                  <option value="P2">P2 — Démonstration</option>
-                  <option value="P3">P3 — Culture / Diff.</option>
-                </select>
-              </div>
-              <div class="form-group form-actions-inline">
-                <label>&nbsp;</label>
-                <div class="btn-group">
-                  <button class="btn-primary" id="save-url-btn">Ajouter</button>
-                  <button class="btn-ghost" id="cancel-url-btn">Annuler</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>URL</th>
-                <th>Pilier</th>
-                <th>Actif</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="urls-tbody">
-              <tr><td colspan="5" class="table-loading">Chargement…</td></tr>
-            </tbody>
-          </table>
-        </section>
-
-        <!-- Section 2 : Calls -->
-        <section class="sources-section">
-          <div class="section-header">
-            <div>
-              <h2 class="section-title">Calls clients</h2>
-              <p class="section-desc">Insights extraits de vos appels et notes clients</p>
-            </div>
-            <button class="btn-primary" id="add-call-btn">+ Ajouter un call</button>
-          </div>
-
-          <div id="add-call-form" class="add-form hidden">
-            <div class="form-group">
-              <label>Nom du call</label>
-              <input type="text" id="new-call-name" placeholder="ex: Call découverte — Client X — 04/05/2026">
-            </div>
-            <div class="form-group">
-              <label>Coller la transcription ou les notes</label>
-              <textarea id="new-call-content" rows="7" placeholder="Collez ici la transcription ou les notes du call…"></textarea>
-            </div>
-            <div class="form-group">
-              <label>Ou importer un fichier .txt</label>
-              <input type="file" id="new-call-file" accept=".txt" class="file-input">
-              <p class="form-hint">Formats supportés : .txt — Pour les PDF, copiez-collez le texte ci-dessus.</p>
-            </div>
-            <div class="form-actions">
-              <button class="btn-primary" id="save-call-btn">Analyser et ajouter ↗</button>
-              <button class="btn-ghost" id="cancel-call-btn">Annuler</button>
-            </div>
-          </div>
-
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Date</th>
-                <th>Insights extraits</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="calls-tbody">
-              <tr><td colspan="4" class="table-loading">Chargement…</td></tr>
-            </tbody>
-          </table>
-        </section>
-
-        <!-- Section 3 : Repurposing -->
-        <section class="sources-section">
-          <div class="section-header">
-            <div>
-              <h2 class="section-title">Repurposing</h2>
-              <p class="section-desc">Transformez du contenu existant en nouveaux angles LinkedIn</p>
-            </div>
-          </div>
-
-          <div class="repurposing-input-row">
-            <div class="form-group fg-grow">
-              <label>URL d'un article, post ou contenu à réutiliser</label>
-              <div class="input-btn-row">
-                <input type="url" id="repurposing-url" placeholder="https://...">
-                <button class="btn-primary" id="analyze-btn">Analyser ↗</button>
-              </div>
-            </div>
-          </div>
-
-          <div id="repurposing-list">
-            <div class="table-empty">Aucun contenu analysé pour l'instant.</div>
-          </div>
+          <textarea id="verbatims-textarea" rows="9" placeholder="Un verbatim par ligne…"></textarea>
+          <input type="hidden" id="verbatims-record-id" value="">
         </section>
 
       </div>
     </div>
 
   </div>
-  <!-- /app -->
 
-  <!-- =================== MODAL : ÉCRIRE =================== -->
+  <!-- ========== MODAL : ÉCRIRE ========== -->
   <div id="write-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal">
       <div class="modal-header">
@@ -289,9 +224,7 @@
           <label>Hook</label>
           <div id="write-hook-display" class="hook-display"></div>
         </div>
-        <button class="btn-primary btn-full" id="generate-post-btn">
-          <span id="gen-btn-label">Générer le post ↗</span>
-        </button>
+        <button class="btn-primary btn-full" id="generate-post-btn">Générer le post ↗</button>
         <div id="post-output-group" class="form-group hidden">
           <label>Post généré <span class="label-hint">(modifiable)</span></label>
           <textarea id="post-content" rows="13" spellcheck="true"></textarea>
@@ -307,29 +240,7 @@
     </div>
   </div>
 
-  <!-- =================== MODAL : CALL INSIGHTS =================== -->
-  <div id="call-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-    <div class="modal modal-wide">
-      <div class="modal-header">
-        <h3 class="modal-title" id="call-modal-title">Insights du call</h3>
-        <button class="modal-close" id="close-call-modal" aria-label="Fermer">✕</button>
-      </div>
-      <div class="modal-body" id="call-modal-body"></div>
-    </div>
-  </div>
-
-  <!-- =================== MODAL : REPURPOSING ANGLES =================== -->
-  <div id="repurposing-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-    <div class="modal modal-wide">
-      <div class="modal-header">
-        <h3 class="modal-title" id="repurposing-modal-title">Angles identifiés</h3>
-        <button class="modal-close" id="close-repurposing-modal" aria-label="Fermer">✕</button>
-      </div>
-      <div class="modal-body" id="repurposing-modal-body"></div>
-    </div>
-  </div>
-
-  <!-- =================== MODAL : CARD DETAIL =================== -->
+  <!-- ========== MODAL : CARD DETAIL ========== -->
   <div id="card-detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal">
       <div class="modal-header">

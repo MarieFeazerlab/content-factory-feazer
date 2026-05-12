@@ -29,17 +29,8 @@ exports.handler = async (event) => {
 
     if (!table) throw new Error('table required');
 
-    // Resolve table name to ID, fall back gracefully for unknown tables
-    const tableId = TABLE_MAP[table];
-    if (!tableId) {
-      console.log(`[airtable] Unknown table "${table}" — returning empty response`);
-      if (action === 'list')   return { statusCode: 200, headers: CORS, body: JSON.stringify({ records: [] }) };
-      if (action === 'create') return { statusCode: 200, headers: CORS, body: JSON.stringify({ record: { id: null, fields: {} } }) };
-      if (action === 'update') return { statusCode: 200, headers: CORS, body: JSON.stringify({ record: { id: recordId, fields: {} } }) };
-      if (action === 'delete') return { statusCode: 200, headers: CORS, body: JSON.stringify({ deleted: true }) };
-      return { statusCode: 200, headers: CORS, body: JSON.stringify({}) };
-    }
-
+    // Resolve table name to ID, fall back to using the name directly
+    const tableId = TABLE_MAP[table] || encodeURIComponent(table);
     const tableUrl = `${BASE_URL}/${tableId}`;
     let airtableRes, data;
 
@@ -50,6 +41,7 @@ exports.handler = async (event) => {
         params.set('pageSize', '100');
         airtableRes = await fetch(`${tableUrl}?${params}`, { headers: atHeaders() });
         data = await airtableRes.json();
+        if (airtableRes.status === 404) return { statusCode: 200, headers: CORS, body: JSON.stringify({ records: [] }) };
         if (!airtableRes.ok) throw new Error(data.error?.message || 'Airtable error');
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ records: data.records || [] }) };
       }

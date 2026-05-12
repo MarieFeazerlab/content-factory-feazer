@@ -37,13 +37,40 @@ exports.handler = async (event) => {
     const key = process.env.ANTHROPIC_KEY;
     console.log('[generate] ANTHROPIC_KEY:', key ? `${key.slice(0, 10)}… (${key.length} chars)` : 'UNDEFINED');
 
-    const { pilier, pilierLabel, semaine, profil, profilLabel, jour, sources = [] } = JSON.parse(event.body || '{}');
+    const { pilier, pilierLabel, semaine, profil, profilLabel, jour } = JSON.parse(event.body || '{}');
 
     if (!pilier || !semaine) throw new Error('pilier and semaine required');
 
-    const sourcesList = sources.length > 0
-      ? sources.map(s => `- ${s.nom}: ${s.url}`).join('\n')
-      : '- Aucune source configurée, base-toi sur tes connaissances générales du marketing et du branding.';
+    // Fetch sources directly from Airtable
+    let sourcesList = '- Aucune source configurée, base-toi sur tes connaissances générales du marketing et du branding.';
+    try {
+      const atSrcRes = await fetch(
+        `https://api.airtable.com/v0/${BASE_ID}/Sources?pageSize=100`,
+        { headers: atHeaders() }
+      );
+      if (atSrcRes.ok) {
+        const atSrcData = await atSrcRes.json();
+        const srcRecords = atSrcData.records || [];
+        if (srcRecords.length > 0) {
+          const lines = srcRecords.flatMap(r => {
+            if (r.fields.URL) {
+              return [`- ${r.fields.Nom || r.fields.URL}: ${r.fields.URL}`];
+            }
+            if (r.fields.Notes) {
+              return r.fields.Notes
+                .split('\n')
+                .map(v => v.trim())
+                .filter(Boolean)
+                .map(v => `- Verbatim client : "${v}"`);
+            }
+            return [];
+          });
+          if (lines.length > 0) sourcesList = lines.join('\n');
+        }
+      }
+    } catch (srcErr) {
+      console.warn('[generate] Sources fetch failed, using fallback:', srcErr.message);
+    }
 
     const prompt = `Tu es stratège de contenu LinkedIn senior pour Feazer, une agence créative et marketing française de référence.
 
