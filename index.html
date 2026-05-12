@@ -178,6 +178,20 @@
             <ul class="source-url-list" id="sources-cat-feazer-src"><li class="source-loading">Chargement…</li></ul>
           </div>
 
+          <div class="source-category-card">
+            <div class="source-cat-header">
+              <h3 class="source-cat-title">IA for Creative</h3>
+              <button class="btn-ghost-sm" onclick="toggleAddSourceForm('ia-creative')">+ Ajouter</button>
+            </div>
+            <div id="add-form-ia-creative" class="source-add-form hidden">
+              <input type="text" id="new-src-name-ia-creative" placeholder="Nom">
+              <input type="url" id="new-src-url-ia-creative" placeholder="https://…">
+              <button class="btn-primary" onclick="addSource('IA for Creative','ia-creative')">OK</button>
+              <button class="btn-ghost" onclick="toggleAddSourceForm('ia-creative')">✕</button>
+            </div>
+            <ul class="source-url-list" id="sources-cat-ia-creative"><li class="source-loading">Chargement…</li></ul>
+          </div>
+
         </div>
 
         <!-- Verbatims terrain -->

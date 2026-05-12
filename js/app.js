@@ -63,10 +63,11 @@ const MONTHS_FR = [
 
 // Category config for sources page
 const SOURCE_CATEGORIES = [
-  { slug: 'crea',       name: 'Créa / Design' },
-  { slug: 'mktfr',      name: 'Marketing / Data FR' },
-  { slug: 'mktglobal',  name: 'Marketing / Data Global' },
-  { slug: 'feazer-src', name: 'Feazer' },
+  { slug: 'crea',        name: 'Créa / Design' },
+  { slug: 'mktfr',       name: 'Marketing / Data FR' },
+  { slug: 'mktglobal',   name: 'Marketing / Data Global' },
+  { slug: 'feazer-src',  name: 'Feazer' },
+  { slug: 'ia-creative', name: 'IA for Creative' },
 ];
 
 // ──────────────────────────────────────────────
