@@ -26,7 +26,13 @@ const DEFAULT_SOURCES = [
   { Nom: 'Brand New',           url: 'https://www.underconsideration.com/brandnew',                       Pilier: 'P3' },
   { Nom: "It's Nice That",      url: 'https://www.itsnicethat.com',                                       Pilier: 'P3' },
   { Nom: 'Dezeen',              url: 'https://www.dezeen.com/design',                                     Pilier: 'P3' },
-  { Nom: 'Fast Company Design', url: 'https://www.fastcompany.com/design',                                Pilier: 'P3' },
+  { Nom: 'Fast Company Design',          url: 'https://www.fastcompany.com/design',                                                                    Pilier: 'P3' },
+  { Nom: 'Blog du Modérateur IA Design', url: 'https://www.blogdumoderateur.com/72-pourcent-designers-ia-generative/',                             Pilier: 'P4' },
+  { Nom: 'Adobe Firefly France',         url: 'https://www.adobe.com/fr/products/firefly/discover/ai-in-creative-industries-france.htm',           Pilier: 'P4' },
+  { Nom: 'HubSpot IA Stats',             url: 'https://www.hubspot.fr/statistiques-intelligence-artificielle',                                     Pilier: 'P4' },
+  { Nom: 'BCG GenAI CMO',                url: 'https://www.bcg.com/press/20june2025-ia-generative-cmo-investment-trend',                           Pilier: 'P4' },
+  { Nom: 'Osmova IA Graphistes',         url: 'https://osmova.com/ia-va-t-elle-remplacer-les-graphistes/',                                         Pilier: 'P4' },
+  { Nom: 'Webmarketing-com IA Canva',    url: 'https://www.webmarketing-com.com/etude-ia-generative-marketing-digital-96-marketeurs-virage',       Pilier: 'P4' },
 ];
 
 const TABLE_SCHEMAS = [
