@@ -201,10 +201,12 @@
               <h2 class="section-title">Terrain / RDV clients</h2>
               <p class="section-desc">Verbatims clients — utilisés comme contexte dans la génération d'idées</p>
             </div>
-            <button class="btn-primary" id="save-verbatims-btn">Sauvegarder</button>
           </div>
-          <textarea id="verbatims-textarea" rows="9" placeholder="Un verbatim par ligne…"></textarea>
-          <input type="hidden" id="verbatims-record-id" value="">
+          <div class="verbatim-add-row">
+            <input type="text" id="new-verbatim-input" placeholder="Ajouter un verbatim client…">
+            <button class="btn-primary" id="add-verbatim-btn">Ajouter</button>
+          </div>
+          <ul class="source-url-list verbatims-list" id="verbatims-list"><li class="source-loading">Chargement…</li></ul>
         </section>
 
       </div>

@@ -676,7 +676,7 @@ button { cursor: pointer; border: none; outline: none; }
 .status-badge:hover { opacity: 0.8; }
 
 .status-brouillon     { background: #252b26; color: var(--text-muted); border: 1px solid var(--border); }
-.status-pret          { background: #0f2e22; color: #1befb2; border: 1px solid rgba(27,239,178,0.25); }
+.status-pret          { background: #FF8C00; color: #fff; border: 1px solid #FF8C00; }
 .status-publie        { background: #0c2040; color: #7eb9f5; border: 1px solid rgba(126,185,245,0.25); }
 
 /* ============================================================
@@ -1163,6 +1163,23 @@ button { cursor: pointer; border: none; outline: none; }
   font-size: 12px;
 }
 .source-add-form input[type="url"] { flex: 2; }
+
+.verbatim-add-row {
+  display: flex;
+  gap: 8px;
+}
+.verbatim-add-row input { flex: 1; }
+
+.verbatims-list { max-height: 320px; }
+
+.verbatim-text {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+  white-space: normal;
+  word-break: break-word;
+}
 
 .source-url-list {
   list-style: none;

@@ -467,14 +467,25 @@ async function openWriteModal(recordId) {
     hookGroup.style.display = 'none';
   }
 
-  document.getElementById('post-output-group').classList.add('hidden');
-  document.getElementById('post-content').value = '';
-  document.getElementById('char-count').textContent = '0 / 3000 caractères';
-  document.getElementById('char-count').classList.remove('over');
   const genBtn = document.getElementById('generate-post-btn');
   genBtn.textContent = 'Générer le post ↗';
   genBtn.disabled = false;
   genBtn.classList.remove('btn-loading');
+
+  const existingPost = cached['Post rédigé'] || '';
+  const markReadyBtn = document.getElementById('mark-ready-btn');
+  if (existingPost) {
+    document.getElementById('post-content').value = existingPost;
+    updateCharCount(existingPost);
+    document.getElementById('post-output-group').classList.remove('hidden');
+    markReadyBtn.textContent = 'Mettre à jour ✓';
+  } else {
+    document.getElementById('post-output-group').classList.add('hidden');
+    document.getElementById('post-content').value = '';
+    document.getElementById('char-count').textContent = '0 / 3000 caractères';
+    document.getElementById('char-count').classList.remove('over');
+    markReadyBtn.textContent = 'Marquer comme prêt ✓';
+  }
 
   document.getElementById('write-modal').classList.remove('hidden');
 }
@@ -603,7 +614,15 @@ async function markAsReady() {
       }
     }
 
-    toast('Marqué comme prêt à publier !', 'success');
+    if (state.currentCard) {
+      state.cardCache[state.currentCard.recordId] = {
+        ...(state.cardCache[state.currentCard.recordId] || {}),
+        'Post rédigé': post,
+        Statut: 'Prêt à publier',
+      };
+    }
+    const isUpdate = document.getElementById('mark-ready-btn').textContent.includes('Mettre à jour');
+    toast(isUpdate ? 'Post mis à jour.' : 'Marqué comme prêt à publier !', 'success');
     closeWriteModal();
   } catch (err) {
     toast(`Erreur : ${err.message}`, 'error');
@@ -625,6 +644,7 @@ async function loadSourcesPage() {
     document.getElementById(`sources-cat-${cat.slug}`).innerHTML =
       '<li class="source-loading">Chargement…</li>';
   });
+  document.getElementById('verbatims-list').innerHTML = '<li class="source-loading">Chargement…</li>';
 
   try {
     const res = await airtableGet('Sources', '');
@@ -635,15 +655,15 @@ async function loadSourcesPage() {
       renderSourceCategory(cat.slug, catRecords);
     });
 
-    // Verbatims: one record with Catégorie = 'Terrain / RDV clients'
-    const verbatimsRec = records.find(r => r.fields['Catégorie'] === 'Terrain / RDV clients');
-    document.getElementById('verbatims-textarea').value = verbatimsRec?.fields.Notes || '';
-    document.getElementById('verbatims-record-id').value = verbatimsRec?.id || '';
+    const verbatimsRecs = records.filter(r => r.fields['Catégorie'] === 'Terrain / RDV clients');
+    renderVerbatims(verbatimsRecs);
   } catch {
     SOURCE_CATEGORIES.forEach(cat => {
       document.getElementById(`sources-cat-${cat.slug}`).innerHTML =
         '<li class="source-empty">Aucune source configurée.</li>';
     });
+    document.getElementById('verbatims-list').innerHTML =
+      '<li class="source-empty">Aucune source configurée.</li>';
   }
 }
 
@@ -718,30 +738,54 @@ async function deleteSource(recordId, slug) {
   }
 }
 
-async function saveVerbatims() {
-  const text = document.getElementById('verbatims-textarea').value.trim();
-  const recordId = document.getElementById('verbatims-record-id').value;
-  const btn = document.getElementById('save-verbatims-btn');
+function renderVerbatims(records) {
+  const ul = document.getElementById('verbatims-list');
+  if (!records || records.length === 0) {
+    ul.innerHTML = '<li class="source-empty">Aucun verbatim ajouté.</li>';
+    return;
+  }
+  ul.innerHTML = records.map(r => `
+    <li class="source-url-item">
+      <span class="verbatim-text">${escHtml(r.fields.Notes || r.fields.Nom || '')}</span>
+      <button class="btn-remove-source" onclick="deleteVerbatim('${r.id}')" title="Supprimer">×</button>
+    </li>
+  `).join('');
+}
+
+async function addVerbatim() {
+  const input = document.getElementById('new-verbatim-input');
+  const text = input.value.trim();
+  if (!text) { toast('Verbatim requis.', 'error'); return; }
+
+  const btn = document.getElementById('add-verbatim-btn');
   btn.disabled = true;
-  btn.classList.add('btn-loading');
 
   try {
-    if (recordId) {
-      await airtableUpdate('Sources', recordId, { Notes: text });
-    } else {
-      const res = await airtableCreate('Sources', {
-        Nom: 'Verbatims clients',
-        'Catégorie': 'Terrain / RDV clients',
-        Notes: text,
-      });
-      document.getElementById('verbatims-record-id').value = res.record?.id || '';
-    }
-    toast('Verbatims sauvegardés.', 'success');
+    await airtableCreate('Sources', {
+      Nom: text.slice(0, 50),
+      Notes: text,
+      'Catégorie': 'Terrain / RDV clients',
+    });
+    input.value = '';
+    toast('Verbatim ajouté.', 'success');
+    const res = await airtableGet('Sources', `{Catégorie}='Terrain / RDV clients'`);
+    renderVerbatims(res.records || []);
   } catch (err) {
     toast(`Erreur : ${err.message}`, 'error');
   } finally {
     btn.disabled = false;
-    btn.classList.remove('btn-loading');
+  }
+}
+
+async function deleteVerbatim(recordId) {
+  if (!confirm('Supprimer ce verbatim ?')) return;
+  try {
+    await airtableDelete('Sources', recordId);
+    toast('Verbatim supprimé.', 'success');
+    const res = await airtableGet('Sources', `{Catégorie}='Terrain / RDV clients'`);
+    renderVerbatims(res.records || []);
+  } catch (err) {
+    toast(`Erreur : ${err.message}`, 'error');
   }
 }
 
@@ -824,8 +868,11 @@ function init() {
     if (e.target === e.currentTarget) closeWriteModal();
   });
 
-  // Sources — verbatims save
-  document.getElementById('save-verbatims-btn').addEventListener('click', saveVerbatims);
+  // Sources — verbatims
+  document.getElementById('add-verbatim-btn').addEventListener('click', addVerbatim);
+  document.getElementById('new-verbatim-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addVerbatim();
+  });
 
   // ESC closes modals
   document.addEventListener('keydown', e => {
