@@ -72,6 +72,7 @@ export default async function handler(req, res) {
     console.log('[generate] ANTHROPIC_KEY:', key ? `${key.slice(0, 10)}… (${key.length} chars)` : 'UNDEFINED');
 
     const { pilier, pilierLabel, semaine, profil, profilLabel, jour } = req.body || {};
+    console.log('[generate] profil reçu:', profil, '| profilLabel reçu:', profilLabel);
 
     if (!pilier || !semaine) throw new Error('pilier and semaine required');
 
