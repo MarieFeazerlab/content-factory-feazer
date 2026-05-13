@@ -121,7 +121,7 @@ function formatDateFull(date) {
 // Extract short code (P1 / P2 / P3) from any pilier representation
 // ──────────────────────────────────────────────
 function pilierCode(p) {
-  const m = String(p || '').match(/^P[123]/);
+  const m = String(p || '').match(/^P[1234]/);
   return m ? m[0] : String(p || '');
 }
 
@@ -398,6 +398,7 @@ async function generateWeek() {
       document.getElementById(`cards-col-${i}`).innerHTML =
         '<div class="col-empty-state"><p>Génération en cours…</p></div>';
       try {
+        console.log(`[generateWeek] pilier=${pilier} semaine=${semaine} profil=${profil}`);
         const result = await api('generate', {
           pilier,
           pilierLabel: PILIERS[pilier].label,
