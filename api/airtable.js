@@ -36,8 +36,10 @@ export default async function handler(req, res) {
         const params = new URLSearchParams();
         if (filter) params.set('filterByFormula', filter);
         params.set('pageSize', '100');
+        console.log(`[airtable] list table="${table}" filter="${filter || '(none)'}"`);
         airtableRes = await fetch(`${tableUrl}?${params}`, { headers: atHeaders() });
         data = await airtableRes.json();
+        console.log(`[airtable] list response status=${airtableRes.status} records=${data.records?.length ?? 0}`, data.error || '');
         if (airtableRes.status === 404) return res.status(200).json({ records: [] });
         if (!airtableRes.ok) throw new Error(data.error?.message || 'Airtable error');
         return res.status(200).json({ records: data.records || [] });

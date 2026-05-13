@@ -259,6 +259,7 @@ function renderWeekHeader() {
 async function loadCalendarCards() {
   const semaine = toISODate(state.weekStart);
   const profil  = PROFILE_LABELS[state.profile];
+  console.log(`[loadCalendarCards] semaine=${semaine} profil="${profil}"`);
 
   state.weekPiliers.forEach((p, i) => {
     document.getElementById(`cards-col-${i}`).innerHTML =
