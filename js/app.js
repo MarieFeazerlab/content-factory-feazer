@@ -270,8 +270,11 @@ async function loadCalendarCards() {
 
   try {
     const filter = `AND({Date de publication}='${semaine}',{Mode de publication}='${profil}')`;
+    console.log(`[loadCalendarCards] filter="${filter}"`);
     const result = await airtableGet('Calendrier éditorial', filter);
     const records = result.records || [];
+    console.log(`[loadCalendarCards] ${records.length} records trouvés`);
+    if (records.length > 0) console.log('[loadCalendarCards] premier record fields:', JSON.stringify(records[0].fields));
 
     const byPilier = {};
     state.weekPiliers.forEach(p => { byPilier[p] = []; });
@@ -418,6 +421,7 @@ async function generateWeek() {
               Statut:                'Brouillon',
               Pilier:                pilier,
               'Mode de publication': PROFILE_LABELS[profil],
+              'Date de publication': semaine,
             },
           })));
         }
