@@ -269,7 +269,7 @@ async function loadCalendarCards() {
   });
 
   try {
-    const filter = `AND({Date de publication}='${semaine}',{Mode de publication}='${profil}')`;
+    const filter = `AND(IS_SAME({Date de publication},'${semaine}','day'),{Mode de publication}='${profil}')`;
     console.log(`[loadCalendarCards] filter="${filter}"`);
     const result = await airtableGet('Calendrier éditorial', filter);
     const records = result.records || [];
