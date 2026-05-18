@@ -131,10 +131,8 @@ ${PILIER_SOURCE_INSTRUCTIONS[pilier]}
 
 En t'appuyant sur ces sources et sur l'actualité du secteur, génère exactement 10 idées de posts LinkedIn distinctes, pertinentes et actionnables pour ce pilier.
 
-VOIX ÉDITORIALE :
-- Ton direct, sobre, sans jargon
-- Phrases courtes, prose fluide — pas de listes à puces systématiques
-- Ancré dans des situations concrètes vécues par les équipes marketing
+VOIX ÉDITORIALE — PAGE ENTREPRISE FEAZER :
+Voix de marque, pas voix personnelle : jamais de "je", ni de "nous on pense que". Ton direct, assertif, factuel — Feazer parle comme un expert qui n'a pas besoin de se vendre. Phrases courtes, prose sobre, pas de listes à puces systématiques. Le "vous" s'adresse toujours au responsable marketing/communication, jamais à un grand public. Les titres parlent de situations concrètes vécues par les équipes marketing, pas de concepts généraux. Ton PAGE OK : "Vos pics de créa ne suivent pas le calendrier." / "Votre directeur doit valider." Ton À ÉVITER : "J'ai appris que..." / "On a découvert..." / "Notre équipe pense..."
 
 RÈGLES ABSOLUES — à respecter sans exception :
 1. MOTS INTERDITS : révolutionnaire, game-changer, incroyable, vraiment, booster, friction, chaos, scale
