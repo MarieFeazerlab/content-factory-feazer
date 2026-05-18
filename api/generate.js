@@ -17,10 +17,10 @@ const PILIER_LABEL = {
 };
 
 const PILIER_DESC = {
-  P1: 'Autorité — positionnement expert, données sectorielles, benchmarks, tendances marché',
-  P2: "Démonstration — cas pratiques, méthodes de travail, retours d'expérience, preuves concrètes",
-  P3: "Culture / Différenciation — vision de l'agence, valeurs, coulisses créatives, inspirations",
-  P4: "IA for Creative — usage de l'IA dans les métiers créatifs et marketing, outils génératifs, impact sur les équipes créa",
+  P1: "Autorité — Feazer comme expert de la production créative pour les entreprises 200-5000 salariés, B2B et B2C. Données sectorielles, benchmarks, coût réel de la mauvaise créa, impact business du visuel sur les équipes marketing. L'angle : les directions marketing sous-estiment ce que la créa leur coûte quand elle est mal organisée. Feazer est là pour clarifier, mesurer, prouver.",
+  P2: "Démonstration — Preuves concrètes que Feazer délivre pour des équipes marketing de 200 à 5000 salariés. Verbatims clients, cas avant/après, méthodes de travail, délais réels. L'angle : on ne dit pas qu'on est bons, on montre comment ça se passe vraiment quand une équipe marketing travaille avec nous.",
+  P3: "Culture / Différenciation — Feazer est une solution de creative ops qui se plugge aux équipes marketing existantes et aux studios de design internes sans les remplacer. Chef de projet dédié, continuité, réactivité. L'angle : Feazer complète l'équipe interne, il ne la substitue pas.",
+  P4: "IA for Creative — L'IA comme accélérateur maîtrisé pour les équipes créa et marketing de grandes entreprises. Vitesse, gains concrets, outils — mais aussi ce qui ne s'automatise pas et comment l'intégrer sans perdre le contrôle. L'angle : on teste, on maîtrise, on a un point de vue assumé.",
 };
 
 const PILIER_CATEGORIES = {
