@@ -18,7 +18,7 @@ const PILIER_LABEL = {
 
 const PILIER_DESC = {
   P1: "Autorité — Feazer comme expert de la production créative pour les entreprises 200-5000 salariés, B2B et B2C. Données sectorielles, benchmarks, coût réel de la mauvaise créa, impact business du visuel sur les équipes marketing. L'angle : les directions marketing sous-estiment ce que la créa leur coûte quand elle est mal organisée. Feazer est là pour clarifier, mesurer, prouver.",
-  P2: "Démonstration — Preuves concrètes que Feazer délivre pour des équipes marketing de 200 à 5000 salariés. Verbatims clients, cas avant/après, méthodes de travail, délais réels. L'angle : on ne dit pas qu'on est bons, on montre comment ça se passe vraiment quand une équipe marketing travaille avec nous.",
+  P2: "Démonstration — Preuves concrètes que Feazer délivre sur un service spécifique : motion design, illustration, graphic design, identité visuelle, production vidéo, etc. OBLIGATION : chaque post est centré sur UN service Feazer précis, avec un bénéfice mesurable ou un chiffre concret lié à ce service. Sources : feazer.com/services et feazer.com/cas-clients. L'angle : on ne dit pas qu'on est bons, on montre le résultat précis d'un service précis pour un type de client précis. Aucun post générique sur Feazer.",
   P3: "Culture / Différenciation — Feazer est une solution de creative ops qui se plugge aux équipes marketing existantes et aux studios de design internes sans les remplacer. Chef de projet dédié, continuité, réactivité. L'angle : Feazer complète l'équipe interne, il ne la substitue pas.",
   P4: "IA for Creative — L'IA comme accélérateur maîtrisé pour les équipes créa et marketing de grandes entreprises. Vitesse, gains concrets, outils — mais aussi ce qui ne s'automatise pas et comment l'intégrer sans perdre le contrôle. L'angle : on teste, on maîtrise, on a un point de vue assumé.",
 };
@@ -32,7 +32,7 @@ const PILIER_CATEGORIES = {
 
 const PILIER_SOURCE_INSTRUCTIONS = {
   P1: "Utilise UNIQUEMENT les données chiffrées et études des sources Marketing. N'utilise PAS les verbatims clients.",
-  P2: "Utilise UNIQUEMENT les verbatims clients et exemples Feazer. Ancre chaque idée dans une situation client réelle.",
+  P2: "Utilise le contenu de feazer.com/services et feazer.com/cas-clients fourni ci-dessous. Pour chaque idée : 1) Identifie UN service Feazer spécifique (motion design, illustration, graphic design, identité visuelle, etc.) 2) Cite un bénéfice mesurable ou chiffre lié à ce service 3) Ancre dans une situation client réelle ou un cas concret issu des cas clients. STRICTEMENT INTERDIT : posts génériques sur Feazer sans service clairement identifié.",
   P3: "Utilise UNIQUEMENT les tendances créa et design des sources Créa/Design. N'utilise PAS les verbatims clients.",
   P4: "Utilise UNIQUEMENT les données et études IA des sources 'IA for Creative'. Ancre chaque idée dans un cas d'usage concret pour les créatifs ou équipes marketing.",
 };
@@ -57,6 +57,37 @@ export function getWeekPiliers(semaine) {
   return WEEK_ROTATION[(weekNum - 1) % 3];
 }
 
+async function fetchFeazerContent() {
+  const urls = [
+    'https://feazer.com/services',
+    'https://feazer.com/cas-clients',
+  ];
+  const results = await Promise.allSettled(
+    urls.map(async url => {
+      const r = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ContentFactory/1.0)' },
+        signal: AbortSignal.timeout(6000),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const html = await r.text();
+      const text = html
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&[a-zA-Z]+;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 3000);
+      return `=== ${url} ===\n${text}`;
+    })
+  );
+  const content = results
+    .filter(r => r.status === 'fulfilled')
+    .map(r => r.value)
+    .join('\n\n');
+  return content || null;
+}
+
 function setCORS(res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -79,6 +110,17 @@ export default async function handler(req, res) {
     const activePiliers = getWeekPiliers(semaine);
     if (!activePiliers.includes(pilier)) {
       console.warn(`[generate] Pilier ${pilier} hors rotation pour la semaine ${semaine} (actifs: ${activePiliers.join(', ')})`);
+    }
+
+    // For P2 only: fetch feazer.com/services and feazer.com/cas-clients to ground posts in real services
+    let feazerWebContent = null;
+    if (pilier === 'P2') {
+      try {
+        feazerWebContent = await fetchFeazerContent();
+        console.log('[generate] Feazer web content fetched, length:', feazerWebContent?.length ?? 0);
+      } catch (e) {
+        console.warn('[generate] Feazer web content fetch failed:', e.message);
+      }
     }
 
     // Fetch sources from Airtable, filtered by the categories relevant to this pilier
@@ -123,7 +165,12 @@ PILIER : ${pilier} — ${PILIER_DESC[pilier] || pilierLabel}
 JOUR DE PUBLICATION : ${jour}
 SEMAINE : ${semaine}
 
-SOURCES À CONSULTER POUR T'INSPIRER :
+${feazerWebContent ? `CONTENU FEAZER.COM — pages services et cas clients (extrait live) :
+${feazerWebContent}
+
+RÈGLE P2 OBLIGATOIRE : choisis un service Feazer précis identifié dans ce contenu (ex. motion design, illustration, graphic design…). Chaque idée doit cibler un service différent. Aucune idée générique "Feazer fait de la créa".
+
+` : ''}SOURCES À CONSULTER POUR T'INSPIRER :
 ${sourcesList}
 
 INSTRUCTION D'UTILISATION DES SOURCES :
