@@ -17,7 +17,7 @@ const PILIER_LABEL = {
 };
 
 const PILIER_DESC = {
-  P1: "Autorité — Feazer comme expert de la production créative pour les entreprises 200-5000 salariés, B2B et B2C. Données sectorielles, benchmarks, coût réel de la mauvaise créa, impact business du visuel sur les équipes marketing. L'angle : les directions marketing sous-estiment ce que la créa leur coûte quand elle est mal organisée. Feazer est là pour clarifier, mesurer, prouver.",
+  P1: "Autorité — Feazer comme référence sur la production visuelle et créative pour les équipes marketing 200-5000 salariés. Données, benchmarks et études sur : l'impact business du motion design, les tendances visuelles, la production créative, le branding visuel, le contenu visuel sur les réseaux sociaux. L'angle : les directions marketing sous-estiment ce que la créa visuelle leur coûte quand elle est mal organisée. PÉRIMÈTRE STRICT : uniquement design, créa, production visuelle, branding, contenu visuel. Hors scope : SEO, emailing, stratégie digitale générale, paid media.",
   P2: "Démonstration — Preuves concrètes que Feazer délivre sur un service spécifique : motion design, illustration, graphic design, identité visuelle, production vidéo, etc. OBLIGATION : chaque post est centré sur UN service Feazer précis, avec un bénéfice mesurable ou un chiffre concret lié à ce service. Sources : feazer.com/services et feazer.com/cas-clients. L'angle : on ne dit pas qu'on est bons, on montre le résultat précis d'un service précis pour un type de client précis. Aucun post générique sur Feazer.",
   P3: "Culture / Différenciation — Feazer est une solution de creative ops qui se plugge aux équipes marketing existantes et aux studios de design internes sans les remplacer. Chef de projet dédié, continuité, réactivité. L'angle : Feazer complète l'équipe interne, il ne la substitue pas.",
   P4: "IA for Creative — L'IA comme accélérateur maîtrisé pour les équipes créa et marketing de grandes entreprises. Vitesse, gains concrets, outils — mais aussi ce qui ne s'automatise pas et comment l'intégrer sans perdre le contrôle. L'angle : on teste, on maîtrise, on a un point de vue assumé.",
@@ -193,7 +193,7 @@ RÈGLES ABSOLUES — à respecter sans exception :
 9. Sources citées doivent être cohérentes avec la liste fournie
 
 Réponds UNIQUEMENT avec du JSON valide, sans texte autour, sans markdown, sans \`\`\` :
-{"idees":[{"titre":"Sujet complet du post (max 80 caractères)","hook":"Première phrase d'accroche (max 15 mots)","format":"Texte long","source":"Nom de la source inspirante","angle":"Angle unique de ce post en une phrase"}]}
+{"idees":[{"titre":"Sujet complet du post (max 80 caractères)","hook":"Première phrase d'accroche (max 15 mots)","format":"Texte long","source":"Nom de la source inspirante","url":"URL directe de l'article ou page source (null si indisponible)","angle":"Angle unique de ce post en une phrase"}]}
 
 Formats autorisés : "Texte long", "Carrousel", "Image+texte", "Vidéo"
 Génère exactement 10 idées variées dans les formats.`;
