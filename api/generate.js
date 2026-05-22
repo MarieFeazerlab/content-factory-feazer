@@ -193,7 +193,7 @@ RÈGLES ABSOLUES — à respecter sans exception :
 9. Sources citées doivent être cohérentes avec la liste fournie
 
 Réponds UNIQUEMENT avec du JSON valide, sans texte autour, sans markdown, sans \`\`\` :
-{"idees":[{"titre":"Sujet complet du post (max 80 caractères)","hook":"Première phrase d'accroche (max 15 mots)","format":"Texte long","source":"Nom de la source inspirante","url":"URL directe de l'article ou page source (null si indisponible)","angle":"Angle unique de ce post en une phrase"}]}
+{"idees":[{"titre":"Sujet complet du post (max 80 caractères)","hook":"Première phrase d'accroche (max 15 mots)","format":"Texte long","source":"Nom de la source inspirante","url":"URL exacte de la source utilisée parmi la liste fournie (obligatoire si la source a une URL, null uniquement si aucune URL n'est disponible pour cette source)","angle":"Angle unique de ce post en une phrase"}]}
 
 Formats autorisés : "Texte long", "Carrousel", "Image+texte", "Vidéo"
 Génère exactement 10 idées variées dans les formats.`;
