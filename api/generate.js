@@ -244,6 +244,7 @@ Génère exactement 10 idées variées dans les formats.`;
         'Mode de publication': profilLabel,
         'Hook suggéré':        idee.hook || '',
         'Date de publication': semaine,
+        ...(idee.url ? { url_source: idee.url } : {}),
       };
 
       const atRes  = await fetch(AT_BASE, {

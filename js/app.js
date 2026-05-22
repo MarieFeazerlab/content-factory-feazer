@@ -418,6 +418,7 @@ async function generateWeek() {
               'Hook suggéré':        idee.hook,
               Format:                idee.format,
               Source:                idee.source,
+              url:                   idee.url || null,
               Statut:                'Brouillon',
               Pilier:                pilier,
               'Mode de publication': PROFILE_LABELS[profil],
@@ -539,6 +540,11 @@ function openCardDetail(recordId) {
       <div class="card-detail-field">
         <span class="card-detail-label">Source</span>
         <span class="card-detail-value">${escHtml(f.Source)}</span>
+      </div>` : ''}
+      ${f.url ? `
+      <div class="card-detail-field">
+        <span class="card-detail-label">Lien source</span>
+        <a href="${escHtml(f.url)}" target="_blank" rel="noopener" class="card-detail-source-link">${escHtml(getHostname(f.url))}</a>
       </div>` : ''}
     </div>`;
 
