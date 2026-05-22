@@ -541,10 +541,10 @@ function openCardDetail(recordId) {
         <span class="card-detail-label">Source</span>
         <span class="card-detail-value">${escHtml(f.Source)}</span>
       </div>` : ''}
-      ${f.url ? `
+      ${(f.url_source || f.url) ? `
       <div class="card-detail-field">
         <span class="card-detail-label">Lien source</span>
-        <a href="${escHtml(f.url)}" target="_blank" rel="noopener" class="card-detail-source-link">${escHtml(getHostname(f.url))}</a>
+        <a href="${escHtml(f.url_source || f.url)}" target="_blank" rel="noopener" class="card-detail-source-link">${escHtml(getHostname(f.url_source || f.url))}</a>
       </div>` : ''}
     </div>`;
 
