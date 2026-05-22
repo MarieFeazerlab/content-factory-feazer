@@ -247,6 +247,7 @@ Génère exactement 10 idées variées dans les formats.`;
         ...(idee.url ? { url_source: idee.url } : {}),
       };
 
+      console.log('[generate] Airtable payload:', JSON.stringify({ fields }, null, 2));
       const atRes  = await fetch(AT_BASE, {
         method:  'POST',
         headers: atHeaders(),
