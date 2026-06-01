@@ -103,7 +103,8 @@ async function fetchSourceContent(url) {
       .replace(/&[a-zA-Z]+;/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
-      .slice(0, 2000);
+      .slice(0, 5000);
+    console.log(`[fetchSource] ${url} — ${text.slice(0, 200)}`);
     return text;
   } catch (e) {
     return null;
