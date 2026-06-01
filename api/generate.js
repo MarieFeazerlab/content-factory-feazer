@@ -89,24 +89,106 @@ async function fetchFeazerContent() {
 }
 
 async function fetchSourceContent(url) {
+  const start = Date.now();
+  const GLOBAL_TIMEOUT = 20000;
+
+  const timeLeft = () => Math.max(0, GLOBAL_TIMEOUT - (Date.now() - start));
+
+  const stripHtml = html => html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-zA-Z]+;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const KEYWORDS = ['créa', 'crea', 'design', 'visuel', 'visual', 'branding', 'brand', 'motion', 'marketing', 'production', 'contenu', 'content', 'image', 'graphique', 'graphic', 'équipe', 'team', 'agence', 'agency', 'budget', 'brief', 'validation', 'projet', 'project', 'creative', 'campaign', 'campagne'];
+
+  const scoreArticle = title => {
+    const lower = title.toLowerCase();
+    return KEYWORDS.filter(kw => lower.includes(kw)).length;
+  };
+
+  const extractArticles = (html, baseUrl) => {
+    const base = new URL(baseUrl);
+    const basePath = base.pathname.replace(/\/$/, '');
+    const seen = new Set();
+    const results = [];
+    for (const m of html.matchAll(/<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)) {
+      const title = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150);
+      try {
+        const resolved = new URL(m[1], baseUrl);
+        if (
+          resolved.hostname === base.hostname &&
+          resolved.pathname !== base.pathname &&
+          resolved.pathname.startsWith(basePath + '/') &&
+          !resolved.search &&
+          !/\.(jpg|jpeg|png|gif|pdf|svg|webp)$/i.test(resolved.pathname) &&
+          !seen.has(resolved.pathname)
+        ) {
+          seen.add(resolved.pathname);
+          results.push({ url: resolved.href, title });
+        }
+      } catch { /* invalid URL */ }
+    }
+    return results;
+  };
+
   try {
+    console.log(`[fetchSource] Fetching listing: ${url}`);
     const r = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ContentFactory/1.0)' },
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(Math.min(6000, timeLeft())),
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const html = await r.text();
-    const text = html
-      .replace(/<script[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&[a-zA-Z]+;/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 5000);
-    console.log(`[fetchSource] ${url} — ${text.slice(0, 200)}`);
-    return text;
+
+    const candidates = extractArticles(html, url);
+    console.log(`[fetchSource] ${candidates.length} candidats trouvés`);
+
+    const scored = candidates.map(a => ({ ...a, score: scoreArticle(a.title) }));
+    const relevant = scored.filter(a => a.score > 0).sort((a, b) => b.score - a.score).slice(0, 3);
+    const selected = relevant.length > 0 ? relevant : scored.slice(0, 3);
+
+    console.log(`[fetchSource] Articles sélectionnés (${selected.length}):`, selected.map(a => `score=${a.score} "${a.title.slice(0, 60)}" ${a.url}`));
+
+    if (selected.length === 0) {
+      const text = stripHtml(html).slice(0, 5000);
+      console.log(`[fetchSource] Fallback listing — ${text.slice(0, 200)}`);
+      return text || null;
+    }
+
+    const articleContents = await Promise.all(
+      selected.map(async ({ url: articleUrl, title }) => {
+        try {
+          const remaining = timeLeft();
+          if (remaining < 1000) {
+            console.log(`[fetchSource] Timeout global atteint, skip: ${articleUrl}`);
+            return null;
+          }
+          const ar = await fetch(articleUrl, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ContentFactory/1.0)' },
+            signal: AbortSignal.timeout(Math.min(6000, remaining)),
+          });
+          if (!ar.ok) {
+            console.log(`[fetchSource] ${articleUrl} — HTTP ${ar.status}`);
+            return null;
+          }
+          const text = stripHtml(await ar.text()).slice(0, 1500);
+          console.log(`[fetchSource] ${articleUrl} — ${text.slice(0, 100)}`);
+          return `--- ${title || articleUrl} (${articleUrl}) ---\n${text}`;
+        } catch (e) {
+          console.log(`[fetchSource] ${articleUrl} failed: ${e.message}`);
+          return null;
+        }
+      })
+    );
+
+    const consolidated = articleContents.filter(Boolean).join('\n\n');
+    console.log(`[fetchSource] ${articleContents.filter(Boolean).length} articles consolidés, ${consolidated.length} chars`);
+    return consolidated || null;
   } catch (e) {
+    console.log(`[fetchSource] Erreur listing ${url}: ${e.message}`);
     return null;
   }
 }
