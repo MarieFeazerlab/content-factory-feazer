@@ -88,6 +88,28 @@ async function fetchFeazerContent() {
   return content || null;
 }
 
+async function fetchSourceContent(url) {
+  try {
+    const r = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ContentFactory/1.0)' },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const html = await r.text();
+    const text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&[a-zA-Z]+;/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 2000);
+    return text;
+  } catch (e) {
+    return null;
+  }
+}
+
 function setCORS(res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -138,20 +160,25 @@ export default async function handler(req, res) {
         const atSrcData = await atSrcRes.json();
         const srcRecords = atSrcData.records || [];
         if (srcRecords.length > 0) {
-          const lines = srcRecords.flatMap(r => {
+          const lines = await Promise.all(srcRecords.flatMap(r => {
             if (r.fields.url) {
-              return [`- ${r.fields.Nom || r.fields.url}: ${r.fields.url}`];
+              return [fetchSourceContent(r.fields.url).then(content => {
+                if (content) {
+                  return `=== ${r.fields.Nom || r.fields.url} (${r.fields.url}) ===\n${content}`;
+                }
+                return `- ${r.fields.Nom || r.fields.url}: ${r.fields.url}`;
+              })];
             }
             if (r.fields.Notes) {
               return r.fields.Notes
                 .split('\n')
                 .map(v => v.trim())
                 .filter(Boolean)
-                .map(v => `- Verbatim client : "${v}"`);
+                .map(v => Promise.resolve(`- Verbatim client : "${v}"`));
             }
             return [];
-          });
-          if (lines.length > 0) sourcesList = lines.join('\n');
+          }));
+          if (lines.length > 0) sourcesList = lines.join('\n\n');
         }
       }
     } catch (srcErr) {
