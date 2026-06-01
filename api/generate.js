@@ -187,7 +187,7 @@ RÈGLES ABSOLUES — à respecter sans exception :
 3. AUCUN tiret cadratin dans les titres ou hooks
 4. Pas de triptyques parfaits ni de structures trop lisses
 5. Hook (max 15 mots) : créer une tension ou curiosité sans dévoiler la conclusion
-6. Corps : au moins un exemple concret ou chiffre réel
+6. Ne jamais inventer de statistique chiffrée précise. Si tu cites un chiffre, il doit être une donnée connue et vérifiable du secteur marketing ou créatif. Sinon, formule l'idée sans chiffre — une observation concrète vaut mieux qu'une stat inventée.
 7. Conclusion : point de vue assumé ou question qui invite à réagir — jamais générique
 8. Chaque idée doit être distincte et apporter une valeur différente
 9. Sources citées doivent être cohérentes avec la liste fournie
