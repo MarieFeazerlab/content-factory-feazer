@@ -326,7 +326,10 @@ function cardHTML(record, slotIndex) {
       <div class="card-title">${escHtml(f['Titre / idée'] || '')}</div>
       ${f['Hook suggéré'] ? `<div class="card-hook">${escHtml(f['Hook suggéré'])}</div>` : ''}
       <div class="card-bottom-row">
-        <span class="card-source">${escHtml(f.Source || '')}</span>
+        ${(f.url || f.url_source)
+          ? `<a class="card-source card-source-link" href="${escHtml(f.url || f.url_source)}" target="_blank" rel="noopener">${escHtml(f.Source || '')}</a>`
+          : `<span class="card-source">${escHtml(f.Source || '')}</span>`
+        }
         <span class="status-badge ${statusClass}" onclick="cycleStatus('${record.id}','${escHtml(f.Statut || 'Brouillon')}','${pCode}')">${escHtml(f.Statut || 'Brouillon')}</span>
       </div>
     </div>`;
