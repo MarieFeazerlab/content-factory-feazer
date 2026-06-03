@@ -29,7 +29,7 @@ PARAMÈTRES DU MOIS :
 - Secteurs cibles : ${secteurs || 'tous secteurs'}
 - Problèmes clients : ${problemes || 'non précisés'}
 - Objectifs : ${objectifs || 'non précisés'}
-- Formats souhaités : ${formats || 'au choix'}
+- Formats disponibles : Article, Ebook, Checklist, Infographie, Étude de cas — choisis le format le plus adapté à l'objectif de chaque idée. Un ebook pour du lead gen, une checklist pour du nurturing, un article pour du SEO, etc.
 - Contexte : ${contexte || 'aucun'}
 
 Génère 5 idées de contenus longs formats pertinents pour ces paramètres. Chaque idée doit être actionnable, ancrée dans un problème réel des équipes marketing, et utile pour Feazer (lead gen, notoriété, SEO).

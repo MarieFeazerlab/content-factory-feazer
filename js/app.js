@@ -910,7 +910,6 @@ async function generateContentIdeas() {
   const secteurs  = document.getElementById('contenus-secteurs').value.trim();
   const problemes = document.getElementById('contenus-problemes').value.trim();
   const objectifs = [...document.querySelectorAll('#contenus-objectifs input:checked')].map(c => c.value).join(', ');
-  const formats   = [...document.querySelectorAll('#contenus-formats input:checked')].map(c => c.value).join(', ');
   const contexte  = document.getElementById('contenus-contexte').value.trim();
 
   if (!mois) {
@@ -922,7 +921,7 @@ async function generateContentIdeas() {
   }
 
   try {
-    const result = await api('content-ideas', { secteurs, problemes, objectifs, formats, contexte, mois });
+    const result = await api('content-ideas', { secteurs, problemes, objectifs, contexte, mois });
     result.idees.forEach(idee => {
       contenusState.cache[idee.recordId] = {
         Titre: idee.titre, Format: idee.format, 'Secteur cible': idee.secteur,
