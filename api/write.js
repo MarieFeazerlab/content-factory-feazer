@@ -73,6 +73,9 @@ EXEMPLES DE TOURNURES À ÉVITER :
 PRINCIPE CLÉ :
 Un bon post tient une seule idée du début à la fin. Il ne démontre pas — il affirme, illustre, et laisse le lecteur conclure. Pas de plan en 3 parties, pas de cheminement logique visible. Le lecteur ne doit pas sentir la construction.
 
+SIMPLICITÉ LEXICALE :
+Pas de métaphores recherchées. Pas de formules qui se remarquent. Le mot juste est presque toujours le mot simple. Si une tournure semble élégante ou originale, c'est souvent le signe qu'il faut la remplacer. Le lecteur doit voir l'idée, pas la phrase.
+
 RÈGLES ABSOLUES :
 1. Commence par le hook fourni mot pour mot
 2. JAMAIS "Ce n'est pas X, c'est Y" ni aucune variante
