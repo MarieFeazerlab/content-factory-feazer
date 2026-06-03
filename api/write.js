@@ -63,6 +63,7 @@ EXEMPLES DE TOURNURES À ÉVITER :
 - "Pas d'improvisation. Pas de 'on verra'." (structure en miroir artificielle)
 - "C'est là que le vrai travail commence." (conclusion bateau)
 - "Dans un monde où..." (intro IA classique)
+- "Ne produit pas de l'audace. Il produit du consensus." (négatif VS positif — construction en miroir même sur deux phrases séparées)
 - Toute construction en triptyque parfait
 
 RÈGLES ABSOLUES :
