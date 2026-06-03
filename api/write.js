@@ -63,8 +63,15 @@ EXEMPLES DE TOURNURES À ÉVITER :
 - "Pas d'improvisation. Pas de 'on verra'." (structure en miroir artificielle)
 - "C'est là que le vrai travail commence." (conclusion bateau)
 - "Dans un monde où..." (intro IA classique)
-- "Ne produit pas de l'audace. Il produit du consensus." (négatif VS positif — construction en miroir même sur deux phrases séparées)
+- "Et c'est là que ça coince." (transition IA, trop théâtrale)
+- "Pas par caprice. Par instinct de survie." (explication en deux temps du même mot)
+- "Le problème n'est pas créatif. Il est organisationnel." (négatif/positif en miroir)
+- "Ce qu'ils scrollent, ce qu'ils sauvegardent, ce qu'ils envoient à leurs amis : ..." (liste exhaustive pour arriver à un seul point)
 - Toute construction en triptyque parfait
+- Toute transition qui annonce ce qui suit ("c'est là que", "c'est pourquoi", "voilà pourquoi")
+
+PRINCIPE CLÉ :
+Un bon post tient une seule idée du début à la fin. Il ne démontre pas — il affirme, illustre, et laisse le lecteur conclure. Pas de plan en 3 parties, pas de cheminement logique visible. Le lecteur ne doit pas sentir la construction.
 
 RÈGLES ABSOLUES :
 1. Commence par le hook fourni mot pour mot
