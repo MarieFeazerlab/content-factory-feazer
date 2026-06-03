@@ -79,6 +79,7 @@ Pas de métaphores recherchées. Pas de formules qui se remarquent. Le mot juste
 RÈGLES ABSOLUES :
 1. Commence par le hook fourni mot pour mot
 2. JAMAIS "Ce n'est pas X, c'est Y" ni aucune variante
+2b. INTERDIT aussi : "Pas X. Y." / "Pas X. Pas Y. Z." / "Pas pour X. Pour Y." — toutes les variantes de négation suivie d'affirmation, même sur des phrases séparées.
 3. Aucun tiret cadratin
 4. Mots interdits : révolutionnaire, game-changer, incroyable, vraiment, booster, chaos, scale, honnêtement, friction
 5. Pas de hashtags génériques (#marketing #LinkedIn #business)
