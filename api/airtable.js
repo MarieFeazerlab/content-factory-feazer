@@ -4,7 +4,8 @@ const BASE_ID = 'app59olgEI4U7pf1G';
 const BASE_URL = `https://api.airtable.com/v0/${BASE_ID}`;
 
 const TABLE_MAP = {
-  'Calendrier éditorial': 'tblqdCcogbkp8RZhJ',
+  'Calendrier éditorial':  'tblqdCcogbkp8RZhJ',
+  'Contenus long format':  'tblNG2nqEbLtXZlRM',
 };
 
 const atHeaders = () => ({

@@ -1244,3 +1244,289 @@ button { cursor: pointer; border: none; outline: none; }
   font-size: 13px;
   list-style: none;
 }
+
+/* ============================================================
+   CONTENUS PAGE
+   ============================================================ */
+#page-contenus { overflow-y: auto; }
+
+.contenus-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 36px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.contenus-form-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.contenus-form-header {
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.contenus-form-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.contenus-form-body {
+  padding: 20px 22px;
+}
+
+.contenus-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.contenus-form-actions {
+  padding: 16px 22px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+  cursor: pointer;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s, color 0.15s;
+  user-select: none;
+}
+.checkbox-item:hover { border-color: var(--border-2); color: var(--text); }
+.checkbox-item input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent); }
+
+/* ============================================================
+   CONTENUS LIST
+   ============================================================ */
+.contenus-list-section { display: flex; flex-direction: column; gap: 16px; }
+
+.contenus-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.contenus-list-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+#contenus-list { display: flex; flex-direction: column; gap: 10px; }
+
+.contenus-empty-state,
+.contenus-loading {
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* ============================================================
+   CONTENU CARDS
+   ============================================================ */
+.contenu-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.15s;
+}
+.contenu-card:hover { border-color: var(--border-2); }
+
+.contenu-card--statut-idee      { border-left-color: var(--border-2); }
+.contenu-card--statut-brief     { border-left-color: #854F0B; }
+.contenu-card--statut-redaction { border-left-color: #0C447C; }
+.contenu-card--statut-redige    { border-left-color: #3B6D11; }
+.contenu-card--statut-decline   { border-left-color: var(--accent); }
+
+.contenu-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.contenu-card-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+}
+
+.contenu-objectif-badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(27,239,178,0.1);
+  color: var(--accent);
+  border: 1px solid rgba(27,239,178,0.25);
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.contenu-secteur-badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.contenu-card-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.contenu-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.contenu-card-problem {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.contenu-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+/* Statut badges — contenus */
+.contenu-statut-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+  user-select: none;
+  flex-shrink: 0;
+}
+.contenu-statut-badge:hover { opacity: 0.8; }
+
+.statut-idee      { background: #252b26; color: var(--text-muted); border: 1px solid var(--border); }
+.statut-brief     { background: #FAEEDA; color: #854F0B; }
+.statut-redaction { background: #E6F1FB; color: #0C447C; }
+.statut-redige    { background: #EAF3DE; color: #3B6D11; }
+.statut-decline   { background: rgba(27,239,178,0.15); color: var(--accent); border: 1px solid rgba(27,239,178,0.3); }
+
+/* Buttons — contenus actions */
+.btn-brief {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid rgba(27,239,178,0.3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.btn-brief:hover { background: rgba(27,239,178,0.08); border-color: var(--accent); }
+.btn-brief:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-decline-posts {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: transparent;
+  color: #FF8C00;
+  border: 1px solid rgba(255,140,0,0.3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.btn-decline-posts:hover { background: rgba(255,140,0,0.08); border-color: #FF8C00; }
+.btn-decline-posts:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ============================================================
+   BRIEF MODAL
+   ============================================================ */
+.brief-content {
+  white-space: pre-wrap;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-2);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   CALENDAR CARDS — DERIVED FROM CONTENT
+   ============================================================ */
+.idea-card--derived { border-left: 3px solid #FF6B6B; }
+
+.card-derived-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  background: rgba(27,239,178,0.08);
+  border: 1px solid rgba(27,239,178,0.2);
+  border-radius: var(--radius-sm);
+  padding: 2px 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+}

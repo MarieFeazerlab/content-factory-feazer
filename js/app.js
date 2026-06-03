@@ -237,7 +237,8 @@ function showPage(page) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`page-${page}`).classList.add('page-active');
   document.querySelector(`.nav-tab[data-page="${page}"]`).classList.add('active');
-  if (page === 'sources') loadSourcesPage();
+  if (page === 'sources')  loadSourcesPage();
+  if (page === 'contenus') initContenusPage();
 }
 
 // ──────────────────────────────────────────────
@@ -313,9 +314,11 @@ function cardHTML(record, slotIndex) {
     'Prêt à publier': 'status-pret',
     'Publié':         'status-publie',
   }[f.Statut] || 'status-brouillon';
+  const isDerived = !!f['Contenu source'];
 
   return `
-    <div class="idea-card" data-id="${record.id}" data-pilier="${pCode}" data-slot="${slotIndex}">
+    <div class="idea-card${isDerived ? ' idea-card--derived' : ''}" data-id="${record.id}" data-pilier="${pCode}" data-slot="${slotIndex}">
+      ${isDerived ? `<div class="card-derived-badge">Décliné de : ${escHtml(f['Contenu source'])}</div>` : ''}
       <div class="card-top-row">
         <span class="format-badge">${escHtml(f.Format || 'Texte long')}</span>
         <div class="card-actions-row">
@@ -807,6 +810,295 @@ async function deleteVerbatim(recordId) {
 }
 
 // ──────────────────────────────────────────────
+// CONTENUS PAGE
+// ──────────────────────────────────────────────
+const contenusState = {
+  month:          new Date().toISOString().slice(0, 7),
+  cache:          {},
+  currentBriefId: null,
+};
+
+const CONTENU_STATUTS = ['Idée', 'Brief généré', 'En rédaction', 'Rédigé', 'Décliné en posts'];
+const CONTENU_STATUT_CLASS = {
+  'Idée':             'statut-idee',
+  'Brief généré':     'statut-brief',
+  'En rédaction':     'statut-redaction',
+  'Rédigé':           'statut-redige',
+  'Décliné en posts': 'statut-decline',
+};
+
+function initContenusPage() {
+  const input = document.getElementById('contenus-mois');
+  if (!input.value) input.value = contenusState.month;
+  loadContenusForMonth(input.value);
+}
+
+async function loadContenusForMonth(month) {
+  contenusState.month = month;
+  const container = document.getElementById('contenus-list');
+  container.innerHTML = '<div class="contenus-loading"><p>Chargement…</p></div>';
+  try {
+    const result  = await airtableGet('Contenus long format', `{Mois}='${month}'`);
+    const records = result.records || [];
+    records.forEach(r => { contenusState.cache[r.id] = r.fields; });
+    renderContenusItems(records);
+  } catch (err) {
+    container.innerHTML = `<div class="contenus-empty-state"><p>Erreur : ${escHtml(err.message)}</p></div>`;
+  }
+}
+
+function renderContenusItems(records) {
+  const container = document.getElementById('contenus-list');
+  if (!records || records.length === 0) {
+    container.innerHTML = `
+      <div class="contenus-empty-state">
+        <p>Aucun contenu pour ce mois.<br>Paramétrez et générez des idées, ou ajoutez manuellement.</p>
+      </div>`;
+    return;
+  }
+  container.innerHTML = records.map(r => contenuCardHTML(r)).join('');
+}
+
+function contenuCardHTML(record) {
+  const f       = record.fields;
+  const statut  = f.Statut || 'Idée';
+  const sClass  = CONTENU_STATUT_CLASS[statut] || 'statut-idee';
+  const hasBrief = !!f['Brief généré'];
+
+  return `
+    <div class="contenu-card contenu-card--${sClass}" data-id="${record.id}">
+      <div class="contenu-card-top">
+        <div class="contenu-card-badges">
+          <span class="format-badge">${escHtml(f.Format || 'Article')}</span>
+          ${f.Objectif ? `<span class="contenu-objectif-badge">${escHtml(f.Objectif)}</span>` : ''}
+          ${f['Secteur cible'] ? `<span class="contenu-secteur-badge">${escHtml(f['Secteur cible'])}</span>` : ''}
+        </div>
+        <div class="contenu-card-actions">
+          ${statut === 'Idée' ? `<button class="btn-brief" onclick="generateBriefAction('${record.id}')">Générer le brief ↗</button>` : ''}
+          ${hasBrief ? `<button class="btn-ghost-sm" onclick="viewBrief('${record.id}')">Voir le brief</button>` : ''}
+          ${statut === 'Rédigé' ? `<button class="btn-decline-posts" onclick="declineContentToPosts('${record.id}')">Décliner en posts ↗</button>` : ''}
+          <button class="btn-remove" title="Supprimer" onclick="deleteContenu('${record.id}')">×</button>
+        </div>
+      </div>
+      <div class="contenu-card-title">${escHtml(f.Titre || '')}</div>
+      ${f['Problème adressé'] ? `<div class="contenu-card-problem">${escHtml(f['Problème adressé'])}</div>` : ''}
+      <div class="contenu-card-footer">
+        <span class="contenu-statut-badge ${sClass}" onclick="cycleContenuStatus('${record.id}','${escHtml(statut)}')">${escHtml(statut)}</span>
+      </div>
+    </div>`;
+}
+
+async function cycleContenuStatus(recordId, currentStatus) {
+  const idx       = CONTENU_STATUTS.indexOf(currentStatus);
+  const newStatus = CONTENU_STATUTS[(idx + 1) % CONTENU_STATUTS.length];
+  try {
+    await airtableUpdate('Contenus long format', recordId, { Statut: newStatus });
+    if (contenusState.cache[recordId]) contenusState.cache[recordId].Statut = newStatus;
+    loadContenusForMonth(contenusState.month);
+  } catch {
+    toast('Erreur lors de la mise à jour du statut.', 'error');
+  }
+}
+
+async function generateContentIdeas() {
+  const btn = document.getElementById('generate-content-ideas-btn');
+  btn.disabled = true;
+  btn.classList.add('btn-loading');
+  startLoadingBar();
+
+  const mois      = document.getElementById('contenus-mois').value;
+  const secteurs  = document.getElementById('contenus-secteurs').value.trim();
+  const problemes = document.getElementById('contenus-problemes').value.trim();
+  const objectifs = [...document.querySelectorAll('#contenus-objectifs input:checked')].map(c => c.value).join(', ');
+  const formats   = [...document.querySelectorAll('#contenus-formats input:checked')].map(c => c.value).join(', ');
+  const contexte  = document.getElementById('contenus-contexte').value.trim();
+
+  if (!mois) {
+    toast('Sélectionnez un mois.', 'error');
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+    stopLoadingBar();
+    return;
+  }
+
+  try {
+    const result = await api('content-ideas', { secteurs, problemes, objectifs, formats, contexte, mois });
+    result.idees.forEach(idee => {
+      contenusState.cache[idee.recordId] = {
+        Titre: idee.titre, Format: idee.format, 'Secteur cible': idee.secteur,
+        'Problème adressé': idee.probleme, Objectif: idee.objectif,
+        Statut: 'Idée', Mois: mois, Angle: idee.angle,
+      };
+    });
+    contenusState.month = mois;
+    toast(`${result.idees.length} idées générées !`, 'success');
+    loadContenusForMonth(mois);
+  } catch (err) {
+    toast(`Erreur : ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+    stopLoadingBar();
+  }
+}
+
+async function generateBriefAction(recordId) {
+  const f   = contenusState.cache[recordId];
+  if (!f) return;
+  const btn = document.querySelector(`.contenu-card[data-id="${recordId}"] .btn-brief`);
+  if (btn) { btn.disabled = true; btn.classList.add('btn-loading'); }
+  startLoadingBar();
+  try {
+    const result = await api('content-brief', {
+      recordId,
+      titre:    f.Titre,
+      format:   f.Format,
+      secteur:  f['Secteur cible'],
+      probleme: f['Problème adressé'],
+      objectif: f.Objectif,
+      angle:    f.Angle,
+    });
+    contenusState.cache[recordId] = { ...f, 'Brief généré': result.brief, Statut: 'Brief généré' };
+    toast('Brief généré !', 'success');
+    openBriefModal(recordId, result.brief);
+    loadContenusForMonth(contenusState.month);
+  } catch (err) {
+    toast(`Erreur : ${err.message}`, 'error');
+    if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
+  } finally {
+    stopLoadingBar();
+  }
+}
+
+function viewBrief(recordId) {
+  const f = contenusState.cache[recordId];
+  if (!f || !f['Brief généré']) return;
+  openBriefModal(recordId, f['Brief généré']);
+}
+
+function openBriefModal(recordId, briefText) {
+  contenusState.currentBriefId = recordId;
+  const f = contenusState.cache[recordId] || {};
+  document.getElementById('brief-modal-title').textContent   = f.Titre || 'Brief de production';
+  document.getElementById('brief-modal-content').textContent = briefText;
+  document.getElementById('brief-modal-status').value        = f.Statut || 'Brief généré';
+  document.getElementById('brief-modal').classList.remove('hidden');
+}
+
+function closeBriefModal() {
+  document.getElementById('brief-modal').classList.add('hidden');
+  contenusState.currentBriefId = null;
+}
+
+async function saveBriefStatus() {
+  const recordId = contenusState.currentBriefId;
+  if (!recordId) return;
+  const newStatus = document.getElementById('brief-modal-status').value;
+  const btn       = document.getElementById('save-brief-status-btn');
+  btn.disabled = true;
+  btn.classList.add('btn-loading');
+  try {
+    await airtableUpdate('Contenus long format', recordId, { Statut: newStatus });
+    if (contenusState.cache[recordId]) contenusState.cache[recordId].Statut = newStatus;
+    toast('Statut mis à jour.', 'success');
+    closeBriefModal();
+    loadContenusForMonth(contenusState.month);
+  } catch (err) {
+    toast(`Erreur : ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+  }
+}
+
+async function declineContentToPosts(recordId) {
+  const f = contenusState.cache[recordId];
+  if (!f) return;
+  if (!confirm(`Décliner "${f.Titre}" en posts LinkedIn ?\n\n3 idées de posts seront créées dans le calendrier.`)) return;
+
+  const btn = document.querySelector(`.contenu-card[data-id="${recordId}"] .btn-decline-posts`);
+  if (btn) { btn.disabled = true; btn.classList.add('btn-loading'); }
+  startLoadingBar();
+  try {
+    const result = await api('content-brief', {
+      action:   'decline',
+      recordId,
+      titre:    f.Titre,
+      format:   f.Format,
+      secteur:  f['Secteur cible'],
+      probleme: f['Problème adressé'],
+      objectif: f.Objectif,
+      angle:    f.Angle,
+      brief:    f['Brief généré'],
+    });
+    contenusState.cache[recordId] = { ...f, Statut: 'Décliné en posts' };
+    toast(`${result.count} post(s) ajouté(s) au calendrier !`, 'success');
+    loadContenusForMonth(contenusState.month);
+  } catch (err) {
+    toast(`Erreur : ${err.message}`, 'error');
+    if (btn) { btn.disabled = false; btn.classList.remove('btn-loading'); }
+  } finally {
+    stopLoadingBar();
+  }
+}
+
+async function deleteContenu(recordId) {
+  if (!confirm('Supprimer ce contenu ?')) return;
+  try {
+    await airtableDelete('Contenus long format', recordId);
+    delete contenusState.cache[recordId];
+    toast('Contenu supprimé.', 'success');
+    loadContenusForMonth(contenusState.month);
+  } catch (err) {
+    toast(`Erreur : ${err.message}`, 'error');
+  }
+}
+
+function openAddContenuModal() {
+  document.getElementById('manual-contenu-titre').value    = '';
+  document.getElementById('manual-contenu-secteur').value  = '';
+  document.getElementById('manual-contenu-probleme').value = '';
+  document.getElementById('manual-contenu-format').value   = 'Article';
+  document.getElementById('manual-contenu-objectif').value = 'Lead gen';
+  document.getElementById('add-contenu-modal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('manual-contenu-titre').focus(), 50);
+}
+
+function closeAddContenuModal() {
+  document.getElementById('add-contenu-modal').classList.add('hidden');
+}
+
+async function saveManualContenu() {
+  const titre = document.getElementById('manual-contenu-titre').value.trim();
+  if (!titre) { toast('Titre requis.', 'error'); return; }
+
+  const btn = document.getElementById('save-manual-contenu-btn');
+  btn.disabled = true;
+  btn.classList.add('btn-loading');
+  try {
+    const fields = {
+      Titre:              titre,
+      Format:             document.getElementById('manual-contenu-format').value,
+      'Secteur cible':    document.getElementById('manual-contenu-secteur').value.trim(),
+      Objectif:           document.getElementById('manual-contenu-objectif').value,
+      'Problème adressé': document.getElementById('manual-contenu-probleme').value.trim(),
+      Statut:             'Idée',
+      Mois:               contenusState.month,
+    };
+    const result = await airtableCreate('Contenus long format', fields);
+    contenusState.cache[result.record.id] = fields;
+    toast('Contenu ajouté.', 'success');
+    closeAddContenuModal();
+    loadContenusForMonth(contenusState.month);
+  } catch (err) {
+    toast(`Erreur : ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+  }
+}
+
+// ──────────────────────────────────────────────
 // INIT
 // ──────────────────────────────────────────────
 function init() {
@@ -883,6 +1175,26 @@ function init() {
   document.getElementById('post-content').addEventListener('input', e => updateCharCount(e.target.value));
   document.getElementById('write-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeWriteModal();
+  });
+
+  // Contenus page
+  document.getElementById('generate-content-ideas-btn').addEventListener('click', generateContentIdeas);
+  document.getElementById('add-content-manually-btn').addEventListener('click', openAddContenuModal);
+  document.getElementById('contenus-mois').addEventListener('change', e => loadContenusForMonth(e.target.value));
+
+  // Brief modal
+  document.getElementById('close-brief-modal').addEventListener('click', closeBriefModal);
+  document.getElementById('close-brief-modal-2').addEventListener('click', closeBriefModal);
+  document.getElementById('save-brief-status-btn').addEventListener('click', saveBriefStatus);
+  document.getElementById('brief-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeBriefModal();
+  });
+
+  // Add contenu modal
+  document.getElementById('close-add-contenu-modal').addEventListener('click', closeAddContenuModal);
+  document.getElementById('save-manual-contenu-btn').addEventListener('click', saveManualContenu);
+  document.getElementById('add-contenu-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeAddContenuModal();
   });
 
   // Sources — verbatims

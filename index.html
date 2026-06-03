@@ -42,6 +42,7 @@
         <span class="nav-logo">Content Factory <span class="nav-logo-sep">·</span> Feazer</span>
         <div class="nav-tabs">
           <button class="nav-tab active" data-page="calendar">Calendrier</button>
+          <button class="nav-tab" data-page="contenus">Contenus</button>
           <button class="nav-tab" data-page="sources">Gérer les sources</button>
         </div>
       </div>
@@ -107,6 +108,76 @@
             <div class="col-empty-state"><p>Aucune idée générée.<br>Cliquez sur "Générer la semaine".</p></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ========== CONTENUS ========== -->
+    <div id="page-contenus" class="page">
+      <div class="contenus-page">
+
+        <!-- Section haute — Paramétrage du mois -->
+        <div class="contenus-form-section">
+          <div class="contenus-form-header">
+            <h2 class="contenus-form-title">Paramétrage du mois</h2>
+          </div>
+          <div class="contenus-form-body">
+            <div class="contenus-form-grid">
+              <div class="form-group">
+                <label>Mois</label>
+                <input type="month" id="contenus-mois">
+              </div>
+              <div class="form-group">
+                <label>Secteurs cibles</label>
+                <input type="text" id="contenus-secteurs" placeholder="cosmétique, sport, tech…">
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Problèmes clients à adresser</label>
+                <textarea id="contenus-problemes" rows="2" placeholder="Ex : délais trop longs, briefs incomplets, validations bloquantes…"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Objectifs</label>
+                <div class="checkbox-group" id="contenus-objectifs">
+                  <label class="checkbox-item"><input type="checkbox" value="Lead gen"> Lead gen</label>
+                  <label class="checkbox-item"><input type="checkbox" value="Nurturing"> Nurturing</label>
+                  <label class="checkbox-item"><input type="checkbox" value="SEO"> SEO</label>
+                  <label class="checkbox-item"><input type="checkbox" value="Notoriété"> Notoriété</label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Formats souhaités</label>
+                <div class="checkbox-group" id="contenus-formats">
+                  <label class="checkbox-item"><input type="checkbox" value="Article"> Article</label>
+                  <label class="checkbox-item"><input type="checkbox" value="Ebook"> Ebook</label>
+                  <label class="checkbox-item"><input type="checkbox" value="Checklist"> Checklist</label>
+                  <label class="checkbox-item"><input type="checkbox" value="Infographie"> Infographie</label>
+                  <label class="checkbox-item"><input type="checkbox" value="Étude de cas"> Étude de cas</label>
+                  <label class="checkbox-item"><input type="checkbox" value="Suggérer"> Suggérer</label>
+                </div>
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Contexte <span class="label-hint">(optionnel)</span></label>
+                <input type="text" id="contenus-contexte" placeholder="Ex : rentrée septembre, salon Cannes Lions…">
+              </div>
+            </div>
+          </div>
+          <div class="contenus-form-actions">
+            <button class="btn-primary" id="generate-content-ideas-btn">Générer des idées ↗</button>
+          </div>
+        </div>
+
+        <!-- Section basse — Idées et contenus du mois -->
+        <div class="contenus-list-section">
+          <div class="contenus-list-header">
+            <h2 class="contenus-list-title">Contenus du mois</h2>
+            <button class="btn-ghost-sm" id="add-content-manually-btn">+ Ajouter manuellement</button>
+          </div>
+          <div id="contenus-list">
+            <div class="contenus-empty-state">
+              <p>Aucun contenu pour ce mois.<br>Paramétrez et générez des idées, ou ajoutez manuellement.</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -267,6 +338,77 @@
       <div class="modal-footer">
         <button class="btn-ghost" id="close-card-detail-modal-2">Fermer</button>
         <button class="btn-primary" id="card-detail-write-btn">Écrire ce post ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL : BRIEF ========== -->
+  <div id="brief-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3 class="modal-title" id="brief-modal-title">Brief de production</h3>
+        <button class="modal-close" id="close-brief-modal" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body">
+        <pre id="brief-modal-content" class="brief-content"></pre>
+        <div class="form-group">
+          <label>Statut</label>
+          <select id="brief-modal-status">
+            <option value="Idée">Idée</option>
+            <option value="Brief généré">Brief généré</option>
+            <option value="En rédaction">En rédaction</option>
+            <option value="Rédigé">Rédigé</option>
+            <option value="Décliné en posts">Décliné en posts</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="close-brief-modal-2">Fermer</button>
+        <button class="btn-primary" id="save-brief-status-btn">Enregistrer le statut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL : AJOUTER CONTENU ========== -->
+  <div id="add-contenu-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Ajouter un contenu</h3>
+        <button class="modal-close" id="close-add-contenu-modal" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Titre</label>
+          <input type="text" id="manual-contenu-titre" placeholder="Titre du contenu…">
+        </div>
+        <div class="form-group">
+          <label>Format</label>
+          <select id="manual-contenu-format">
+            <option value="Article">Article</option>
+            <option value="Ebook">Ebook</option>
+            <option value="Checklist">Checklist</option>
+            <option value="Infographie">Infographie</option>
+            <option value="Étude de cas">Étude de cas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Secteur cible</label>
+          <input type="text" id="manual-contenu-secteur" placeholder="Ex : cosmétique…">
+        </div>
+        <div class="form-group">
+          <label>Objectif</label>
+          <select id="manual-contenu-objectif">
+            <option value="Lead gen">Lead gen</option>
+            <option value="Nurturing">Nurturing</option>
+            <option value="SEO">SEO</option>
+            <option value="Notoriété">Notoriété</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Problème adressé <span class="label-hint">(optionnel)</span></label>
+          <input type="text" id="manual-contenu-probleme" placeholder="Ex : délais trop longs…">
+        </div>
+        <button class="btn-primary btn-full" id="save-manual-contenu-btn">Ajouter</button>
       </div>
     </div>
   </div>
