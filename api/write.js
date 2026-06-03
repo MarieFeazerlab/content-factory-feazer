@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     const prompt = `Tu rédiges un post LinkedIn pour ${profileCtx}.
 
 SUJET : ${titre}
-${hook ? `HOOK (utilise-le comme première phrase) : ${hook}` : ''}
+${hook ? `HOOK (utilise-le comme première phrase, mot pour mot) : ${hook}` : ''}
 PILIER : ${pilier} — ${pilierLabel}
 FORMAT : ${format}
 SOURCE D'INSPIRATION : ${source || 'Expertise interne'}
@@ -49,18 +49,37 @@ SOURCE D'INSPIRATION : ${source || 'Expertise interne'}
 INSTRUCTIONS DE FORMAT :
 ${formatInstructions}
 
-RÈGLES ABSOLUES :
-- Commence par le hook fourni (ou crée-en un percutant si non fourni, max 15 mots)
-- JAMAIS "Ce n'est pas X, c'est Y"
-- Aucun tiret cadratin (—)
-- Mots interdits : révolutionnaire, game-changer, incroyable, vraiment, booster, chaos, scale
-- Pas de hashtags génériques (pas #marketing #LinkedIn #business)
-- Maximum 3 hashtags très ciblés, à la fin uniquement
-- Données chiffrées quand pertinent (sourcées ou plausibles)
-- Fin forte : question ouverte, statistique marquante, ou prise de position tranchée
-- Ton adapté au profil : ${profileCtx}
+VOIX ET STYLE — LIS ATTENTIVEMENT :
+Le registre visé : statements courts, imagés, ancrés dans du concret. Une phrase qui claque, puis on déroule simplement. Pas de métaphores filées sur 3 paragraphes.
 
-Écris le post directement, sans introduction ni explication autour.`;
+EXEMPLES DE TOURNURES QUI FONCTIONNENT :
+- "Votre IA doit aussi transpirer."
+- "Votre équipe créa court. Pas parce qu'elle manque de talent. Parce qu'elle manque de bande passante."
+- "Briefs qui disent tout sauf ce qui compte vraiment."
+- "La différence tient souvent à une décision prise avant le premier pixel."
+
+EXEMPLES DE TOURNURES À ÉVITER :
+- "Cela peut enrichir. Cela peut diluer." (symétrie trop lissée)
+- "Pas d'improvisation. Pas de 'on verra'." (structure en miroir artificielle)
+- "C'est là que le vrai travail commence." (conclusion bateau)
+- "Dans un monde où..." (intro IA classique)
+- Toute construction en triptyque parfait
+
+RÈGLES ABSOLUES :
+1. Commence par le hook fourni mot pour mot
+2. JAMAIS "Ce n'est pas X, c'est Y" ni aucune variante
+3. Aucun tiret cadratin
+4. Mots interdits : révolutionnaire, game-changer, incroyable, vraiment, booster, chaos, scale, honnêtement, friction
+5. Pas de hashtags génériques (#marketing #LinkedIn #business)
+6. Maximum 3 hashtags très ciblés, à la fin uniquement
+7. JAMAIS de chiffre inventé — si pas de donnée réelle, formule sans chiffre
+8. Fin forte : question ouverte ou prise de position tranchée — jamais une conclusion molle
+9. Phrases courtes. Une idée par phrase. Pas de subordonnées en cascade.
+10. Zéro structure en miroir, zéro parallélisme artificiel
+
+Le post est en français. Toujours.
+
+Écris le post directement, sans introduction ni explication.`;
 
     const response = await client.messages.create({
       model:      'claude-sonnet-4-6',
