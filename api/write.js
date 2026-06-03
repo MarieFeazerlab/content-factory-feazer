@@ -10,7 +10,7 @@ const PROFILE_CONTEXT = {
 
 const FORMAT_INSTRUCTIONS = {
   'Texte long':  'Post narratif et structuré, 1200–1800 caractères. Paragraphes courts (1-3 lignes). Pas de bullet points au début. Fin forte avec une question ou prise de position.',
-  'Carrousel':   'Script de carrousel LinkedIn en 6 à 8 slides. Format : "Slide X : [Titre court]\\n[Contenu bullet]". Slide 1 = hook accrocheur. Slide finale = CTA ou question.',
+  'Carrousel':   'Script de carrousel LinkedIn en 6 à 8 slides. Format : "Slide X : [Titre court]\\n[Contenu]". Slide 1 = hook accrocheur. Slide finale = question ou prise de position. RÈGLES CARROUSEL : les titres de slides ne commencent JAMAIS par "Ce que", "Pourquoi", "Comment", "Le vrai", "L\'erreur". Chaque slide = une seule affirmation concrète, pas une démonstration. Pas de bullet points. Pas de structure négatif/positif dans le contenu des slides.',
   'Image+texte': "Légende courte et percutante, 300–500 caractères. Contexte de l'image suggéré en première ligne entre [crochets]. Puis le texte.",
   'Vidéo':       'Script de vidéo LinkedIn. Durée cible : 60–90 secondes. Format : "INTRO (5s) :", "DÉVELOPPEMENT :", "CONCLUSION (10s) :". Ton direct, parlé.',
 };
