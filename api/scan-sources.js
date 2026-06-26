@@ -1,0 +1,98 @@
+/* Scan all Airtable Sources and store their 10 latest content items */
+
+const BASE_ID    = 'app59olgEI4U7pf1G';
+const AT_SOURCES = `https://api.airtable.com/v0/${BASE_ID}/Sources`;
+
+const atHeaders = () => ({
+  Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}`,
+  'Content-Type': 'application/json',
+});
+
+function setCORS(res) {
+  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+}
+
+function extractRecentLinks(html, baseUrl) {
+  const base = new URL(baseUrl);
+  const seen = new Set();
+  const results = [];
+
+  for (const m of html.matchAll(/<a[^>]+href="([^"#?]+)"[^>]*>([\s\S]*?)<\/a>/gi)) {
+    const href = m[1].trim();
+    const rawTitle = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!rawTitle || rawTitle.length < 5) continue;
+    try {
+      const resolved = new URL(href, baseUrl);
+      if (
+        resolved.hostname === base.hostname &&
+        resolved.pathname !== base.pathname &&
+        resolved.pathname !== '/' &&
+        !resolved.search &&
+        !/\.(jpg|jpeg|png|gif|pdf|svg|webp|zip|css|js)$/i.test(resolved.pathname) &&
+        !seen.has(resolved.href)
+      ) {
+        seen.add(resolved.href);
+        results.push({ title: rawTitle.slice(0, 150), url: resolved.href });
+      }
+    } catch { /* invalid URL */ }
+  }
+
+  return results.slice(0, 10);
+}
+
+async function scanSource(url) {
+  const r = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ContentFactory/1.0)' },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const html = await r.text();
+  return extractRecentLinks(html, url);
+}
+
+export default async function handler(req, res) {
+  setCORS(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  try {
+    const atRes = await fetch(`${AT_SOURCES}?pageSize=100`, { headers: atHeaders() });
+    if (!atRes.ok) throw new Error(`Airtable fetch failed: ${atRes.status}`);
+    const atData = await atRes.json();
+    const records = atData.records || [];
+
+    const withUrl = records.filter(r => r.fields.url);
+    const results = { updated: 0, skipped: 0, errors: [] };
+
+    await Promise.all(withUrl.map(async record => {
+      const url = record.fields.url;
+      try {
+        const links = await scanSource(url);
+        if (links.length === 0) {
+          results.skipped++;
+          return;
+        }
+        const content = links.map(l => `${l.title} — ${l.url}`).join('\n');
+
+        const patchRes = await fetch(`${AT_SOURCES}/${record.id}`, {
+          method:  'PATCH',
+          headers: atHeaders(),
+          body:    JSON.stringify({ fields: { 'Derniers contenus': content } }),
+        });
+        if (!patchRes.ok) {
+          const patchData = await patchRes.json();
+          throw new Error(patchData.error?.message || `Airtable patch ${patchRes.status}`);
+        }
+        results.updated++;
+      } catch (e) {
+        results.errors.push({ url, error: e.message });
+        results.skipped++;
+      }
+    }));
+
+    return res.status(200).json({ success: true, total: withUrl.length, ...results });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
