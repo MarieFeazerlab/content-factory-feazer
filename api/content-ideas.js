@@ -32,10 +32,10 @@ PARAMÈTRES DU MOIS :
 - Formats disponibles : Article, Ebook, Checklist, Infographie, Étude de cas — choisis le format le plus adapté à l'objectif de chaque idée. Un ebook pour du lead gen, une checklist pour du nurturing, un article pour du SEO, etc.
 - Contexte : ${contexte || 'aucun'}
 
-Génère 5 idées de contenus longs formats pertinents pour ces paramètres. Chaque idée doit être actionnable, ancrée dans un problème réel des équipes marketing, et utile pour Feazer (lead gen, notoriété, SEO).
+Génère 5 idées de contenus longs formats. Chaque idée doit partir d'un problème terrain réel — une situation que vit une équipe marketing concrètement, pas un concept générique. Le titre doit sonner comme quelque chose qu'un directeur marketing dirait en réunion, pas comme un titre de présentation PowerPoint. Évite les formulations type 'Comment X', 'Pourquoi Y', 'Les N raisons de Z'. Préfère une formulation directe, ancrée dans une réalité opérationnelle.
 
 Réponds UNIQUEMENT en JSON valide :
-{"idees":[{"titre":"Titre accrocheur du contenu","format":"Article|Ebook|Checklist|Infographie|Étude de cas","secteur":"secteur cible","objectif":"Lead gen|Nurturing|SEO|Notoriété","angle":"L'angle unique en une phrase","probleme":"Le problème client adressé en une phrase"}]}`;
+{"idees":[{"titre":"Titre du contenu — formulé comme une observation terrain, pas un titre de blog générique","format":"Article|Ebook|Checklist|Infographie|Étude de cas","secteur":"secteur cible","objectif":"Lead gen|Nurturing|SEO|Notoriété","angle":"L'angle unique en une phrase","probleme":"Le problème client adressé en une phrase"}]}`;
 
     const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -45,7 +45,7 @@ Réponds UNIQUEMENT en JSON valide :
         'content-type':      'application/json',
       },
       body: JSON.stringify({
-        model:      'claude-haiku-4-5-20251001',
+        model:      'claude-sonnet-4-6',
         max_tokens: 2048,
         messages:   [{ role: 'user', content: prompt }],
       }),

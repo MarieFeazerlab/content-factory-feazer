@@ -38,10 +38,10 @@ CONTENU SOURCE :
 - Angle : ${angle}
 ${brief ? `- Extrait du brief : ${brief.slice(0, 800)}` : ''}
 
-Génère 3 idées de posts LinkedIn qui déclinent ce contenu. Chaque post doit reprendre un angle différent et être autonome (lisible sans avoir lu le contenu source).
+Génère 3 idées de posts LinkedIn qui déclinent ce contenu. Chaque post doit partir d'une situation concrète, d'un détail terrain, d'une observation réelle — pas d'un concept abstrait. Le hook n'est pas une phrase dramatique construite pour accrocher : c'est la première phrase naturelle qu'on dirait à quelqu'un en lui racontant quelque chose qui s'est passé. Pas de structure en miroir, pas de triptyque, pas de drama. Pas de formulations type 'X. Zéro Y. Tout Z.' Ancre chaque angle dans du concret et du vécu.
 
 Réponds UNIQUEMENT en JSON valide :
-{"posts":[{"titre":"Titre du post LinkedIn (max 80 chars)","hook":"Première phrase d'accroche (max 15 mots)","format":"Texte long|Carrousel|Image+texte","angle":"Angle de ce post en une phrase"}]}`;
+{"posts":[{"titre":"Titre du post LinkedIn (max 80 chars)","hook":"Première phrase — observation concrète ou situation réelle, pas une formule dramatique (max 15 mots)","format":"Texte long|Carrousel|Image+texte","angle":"Angle de ce post en une phrase"}]}`;
 
       const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -51,7 +51,7 @@ Réponds UNIQUEMENT en JSON valide :
           'content-type':      'application/json',
         },
         body: JSON.stringify({
-          model:      'claude-haiku-4-5-20251001',
+          model:      'claude-sonnet-4-6',
           max_tokens: 1024,
           messages:   [{ role: 'user', content: prompt }],
         }),
@@ -140,7 +140,7 @@ Réponds en texte structuré, pas en JSON.`;
         'content-type':      'application/json',
       },
       body: JSON.stringify({
-        model:      'claude-haiku-4-5-20251001',
+        model:      'claude-sonnet-4-6',
         max_tokens: 2048,
         messages:   [{ role: 'user', content: prompt }],
       }),
