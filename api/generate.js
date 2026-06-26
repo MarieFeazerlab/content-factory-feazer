@@ -134,7 +134,7 @@ ${sourcesList}
 INSTRUCTION D'UTILISATION DES SOURCES :
 ${PILIER_SOURCE_INSTRUCTIONS[pilier]}
 
-En t'appuyant sur ces sources et sur l'actualité du secteur, génère exactement 10 idées de posts LinkedIn distinctes, pertinentes et actionnables pour ce pilier.
+En t'appuyant sur ces sources et sur l'actualité du secteur, génère exactement 5 idées de posts LinkedIn distinctes, pertinentes et actionnables pour ce pilier.
 
 VOIX ÉDITORIALE — PAGE ENTREPRISE FEAZER :
 Voix de marque, pas voix personnelle : jamais de "je", ni de "nous on pense que". Ton direct, assertif, factuel — Feazer parle comme un expert qui n'a pas besoin de se vendre. Phrases courtes, prose sobre, pas de listes à puces systématiques. Le "vous" s'adresse toujours au responsable marketing/communication, jamais à un grand public. Les titres parlent de situations concrètes vécues par les équipes marketing, pas de concepts généraux. Ton PAGE OK : "Vos pics de créa ne suivent pas le calendrier." / "Votre directeur doit valider." Ton À ÉVITER : "J'ai appris que..." / "On a découvert..." / "Notre équipe pense..."
@@ -166,7 +166,7 @@ Génère exactement 10 idées variées dans les formats.`;
       },
       body: JSON.stringify({
         model:      'claude-sonnet-4-6',
-        max_tokens: 4096,
+        max_tokens: 2048,
         messages:   [{ role: 'user', content: prompt }],
       }),
     });
@@ -193,7 +193,9 @@ Génère exactement 10 idées variées dans les formats.`;
     if (idees.length === 0) throw new Error('Aucune idée générée.');
 
     // Save to Airtable + collect recordIds
-    const savedIdees = await Promise.all(idees.map(async idee => {
+    const savedIdees = [];
+    for (const idee of idees) {
+      const savedIdee = await (async (idee) => {
       const fields = {
         'Titre / idée':        idee.titre || '',
         Pilier:                PILIER_LABEL[pilier] || pilier,
@@ -218,7 +220,9 @@ Génère exactement 10 idées variées dans les formats.`;
         throw new Error(atData.error?.message || `Airtable error ${atRes.status}`);
       }
       return { ...idee, recordId: atData.id };
-    }));
+      })(idee);
+      savedIdees.push(savedIdee);
+    }
 
     return res.status(200).json({ success: true, idees: savedIdees });
   } catch (err) {
