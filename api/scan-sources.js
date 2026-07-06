@@ -49,12 +49,16 @@ async function scanSource(url) {
   });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const html = await r.text();
-  return extractRecentLinks(html, url);
+  const links = extractRecentLinks(html, url);
+  const anchorCount = (html.match(/<a[^>]+href=/gi) || []).length;
+  return { links, htmlLength: html.length, anchorCount };
 }
 
 export default async function handler(req, res) {
   setCORS(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const dryRun = req.query?.dryRun === '1' || req.body?.dryRun === true;
 
   try {
     const atRes = await fetch(`${AT_SOURCES}?pageSize=100`, { headers: atHeaders() });
@@ -63,16 +67,36 @@ export default async function handler(req, res) {
     const records = atData.records || [];
 
     const withUrl = records.filter(r => r.fields.url);
-    const results = { updated: 0, skipped: 0, errors: [] };
+    const results = { updated: 0, skipped: 0, errors: [], diagnostic: [] };
 
     await Promise.all(withUrl.map(async record => {
       const url = record.fields.url;
+      const nom = record.fields.Nom || '';
       try {
-        const links = await scanSource(url);
-        if (links.length === 0) {
+        const { links, htmlLength, anchorCount } = await scanSource(url);
+        const linksExtracted = links.length;
+
+        let reason = null;
+        if (linksExtracted === 0) {
+          reason = anchorCount === 0
+            ? 'aucune balise <a> — probable rendu JS'
+            : `${anchorCount} liens présents mais filtrés`;
+        }
+
+        results.diagnostic.push({
+          nom, url, htmlLength, anchorCountInPage: anchorCount, linksExtracted, reason,
+        });
+
+        if (linksExtracted === 0) {
           results.skipped++;
           return;
         }
+
+        if (dryRun) {
+          results.updated++;
+          return;
+        }
+
         const content = links.map(l => `${l.title} — ${l.url}`).join('\n');
 
         const patchRes = await fetch(`${AT_SOURCES}/${record.id}`, {

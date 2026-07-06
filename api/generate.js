@@ -97,20 +97,21 @@ export default async function handler(req, res) {
         const srcRecords = atSrcData.records || [];
         if (srcRecords.length > 0) {
           const lines = srcRecords.flatMap(r => {
+            const header = r.fields.Nom || r.fields.url || 'Source';
+            const url = r.fields.url ? ` (${r.fields.url})` : '';
+
             if (r.fields['Derniers contenus']?.trim()) {
-              const header = r.fields.Nom || r.fields.url || 'Source';
-              const url = r.fields.url ? ` (${r.fields.url})` : '';
               return [`=== ${header}${url} ===\n${r.fields['Derniers contenus'].trim()}`];
             }
-            if (r.fields.Notes) {
-              return r.fields.Notes
-                .split('\n')
-                .map(v => v.trim())
-                .filter(Boolean)
+            if (r.fields['Catégorie'] === 'Terrain / RDV clients' && r.fields.Notes) {
+              return r.fields.Notes.split('\n').map(v => v.trim()).filter(Boolean)
                 .map(v => `- Verbatim client : "${v}"`);
             }
+            if (r.fields.Notes) {
+              return [`=== ${header}${url} ===\n${r.fields.Notes.trim()}`];
+            }
             if (r.fields.Nom || r.fields.url) {
-              return [`- ${r.fields.Nom || ''}${r.fields.url ? ': ' + r.fields.url : ''}`];
+              return [`- ${header}${url}`];
             }
             return [];
           });
