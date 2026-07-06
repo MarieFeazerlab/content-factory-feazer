@@ -151,9 +151,10 @@ RÈGLES ABSOLUES — à respecter sans exception :
 7. Conclusion : point de vue assumé ou question qui invite à réagir — jamais générique
 8. Chaque idée doit être distincte et apporter une valeur différente
 9. Sources citées doivent être cohérentes avec la liste fournie
+10. RÉPARTITION DES SOURCES : répartis les 10 idées sur l'ensemble des sources listées ci-dessus. N'utilise pas la même source (même nom, même url) plus de 2 fois sur les 10 idées. Si une seule source contient du contenu réellement exploitable et que les autres sont vides ou trop pauvres, génère uniquement le nombre d'idées que ce volume de sources permet raisonnablement de couvrir sans répétition artificielle, plutôt que de forcer 10 angles différents sur la même source.
 
 Réponds UNIQUEMENT avec du JSON valide, sans texte autour, sans markdown, sans \`\`\` :
-{"idees":[{"titre":"Sujet complet du post (max 80 caractères)","hook":"Première phrase d'accroche (max 15 mots)","format":"Texte long","source":"Nom de la source inspirante","url":"URL exacte de la source utilisée parmi la liste fournie (obligatoire si la source a une URL, null uniquement si aucune URL n'est disponible pour cette source)","angle":"Angle unique de ce post en une phrase"}]}
+{"idees":[{"titre":"Sujet complet du post (max 80 caractères)","hook":"Première phrase d'accroche (max 15 mots)","format":"Texte long","source":"Nom de la source inspirante","url":"URL exacte de la source utilisée parmi la liste fournie (obligatoire si la source a une URL, null uniquement si aucune URL n'est disponible pour cette source)","angle":"Angle unique de ce post en une phrase"}],"sourcesUtilisees":["Liste des noms de sources distinctes utilisées sur l'ensemble des idées générées"]}
 
 Formats autorisés : "Texte long", "Carrousel", "Image+texte", "Vidéo"
 Génère exactement 10 idées variées dans les formats.`;
