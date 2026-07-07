@@ -1,6 +1,24 @@
 {
   "functions": {
-    "api/*.js": {
+    "api/analyze.js": {
+      "maxDuration": 30
+    },
+    "api/setup.js": {
+      "maxDuration": 30
+    },
+    "api/write.js": {
+      "maxDuration": 30
+    },
+    "api/airtable.js": {
+      "maxDuration": 30
+    },
+    "api/content-ideas.js": {
+      "maxDuration": 30
+    },
+    "api/content-brief.js": {
+      "maxDuration": 30
+    },
+    "api/generate.js": {
       "maxDuration": 30
     },
     "api/scan-sources.js": {
