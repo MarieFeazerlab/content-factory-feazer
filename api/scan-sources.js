@@ -39,7 +39,32 @@ function extractRecentLinks(html, baseUrl) {
     } catch { /* invalid URL */ }
   }
 
-  return results.slice(0, 10);
+  return results.slice(0, 3);
+}
+
+function extractArticleExcerpt(html) {
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.slice(0, 900).trim();
+}
+
+async function fetchExcerpt(url) {
+  try {
+    const r = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ContentFactory/1.0)' },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!r.ok) return null;
+    const html = await r.text();
+    const excerpt = extractArticleExcerpt(html);
+    return excerpt.length >= 100 ? excerpt : null;
+  } catch {
+    return null;
+  }
 }
 
 async function scanSource(url) {
@@ -49,8 +74,14 @@ async function scanSource(url) {
   });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const html = await r.text();
-  const links = extractRecentLinks(html, url);
+  const rawLinks = extractRecentLinks(html, url);
   const anchorCount = (html.match(/<a[^>]+href=/gi) || []).length;
+
+  const links = await Promise.all(rawLinks.map(async l => {
+    const excerpt = await fetchExcerpt(l.url);
+    return excerpt ? { ...l, excerpt } : l;
+  }));
+
   return { links, htmlLength: html.length, anchorCount };
 }
 
@@ -97,7 +128,11 @@ export default async function handler(req, res) {
           return;
         }
 
-        const content = links.map(l => `${l.title} — ${l.url}`).join('\n');
+        const content = links
+          .map(l => l.excerpt
+            ? `${l.title} — ${l.url}\nExtrait : ${l.excerpt}`
+            : `${l.title} — ${l.url}`)
+          .join('\n');
 
         const patchRes = await fetch(`${AT_SOURCES}/${record.id}`, {
           method:  'PATCH',
