@@ -140,6 +140,16 @@ En t'appuyant sur ces sources et sur l'actualité du secteur, génère exactemen
 VOIX ÉDITORIALE — PAGE ENTREPRISE FEAZER :
 Voix de marque, pas voix personnelle : jamais de "je", ni de "nous on pense que". Ton direct, assertif, factuel — Feazer parle comme un expert qui n'a pas besoin de se vendre. Phrases courtes, prose sobre, pas de listes à puces systématiques. Le "vous" s'adresse toujours au responsable marketing/communication, jamais à un grand public. Les titres parlent de situations concrètes vécues par les équipes marketing, pas de concepts généraux. Ton PAGE OK : "Vos pics de créa ne suivent pas le calendrier." / "Votre directeur doit valider." Ton À ÉVITER : "J'ai appris que..." / "On a découvert..." / "Notre équipe pense..."
 
+MÉTHODE DE RECHERCHE D'ANGLE (à faire avant de rédiger quoi que ce soit) :
+Un bon post ne part pas d'un fait, il part d'une tension. Pour chaque idée, avant de rédiger le titre et le hook, identifie : qu'est-ce que le lecteur (responsable marketing) est en train de vivre, vouloir, craindre, ou essayer de cacher, en lien avec cette source ?
+
+Le hook ne doit jamais annoncer ce que le lecteur va apprendre. Il doit nommer un écart entre ce qu'il croit montrer et ce que les autres perçoivent.
+
+Exemple faible : "Il faut optimiser votre production visuelle."
+Exemple fort : "Vos visuels donnent peut-être l'impression que votre marque est moins solide qu'elle ne l'est vraiment."
+
+Si tu ne trouves pas de tension réelle dans une source, ne force pas un angle générique dessus. Préfère générer moins de 10 idées plutôt que de remplir le quota avec du contenu plat.
+
 RÈGLES ABSOLUES — à respecter sans exception :
 1. MOTS INTERDITS : révolutionnaire, game-changer, incroyable, vraiment, booster, friction, chaos, scale
 2. CONSTRUCTIONS INTERDITES : "ce n'est pas X c'est Y", "pas parce que X mais parce que Y", et toute variante
